@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: dorsadesign_db
+    environment:
+      POSTGRES_USER: dorsa
+      POSTGRES_PASSWORD: dorsa123
+      POSTGRES_DB: dorsadesign
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - dorsadesign_network
+
+  # برای توسعه - بعداً اضافه می‌شود
+  # backend:
+  #   build: ./backend
+  #   container_name: dorsadesign_backend
+  #   environment:
+  #     DATABASE_URL: postgresql://dorsa:dorsa123@postgres:5432/dorsadesign
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - dorsadesign_network
+
+  # frontend:
+  #   build: ./frontend
+  #   container_name: dorsadesign_frontend
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - dorsadesign_network
+
+networks:
+  dorsadesign_network:
+    driver: bridge
+    name: dorsadesign_network
+
+volumes:
+  postgres_data:
+    name: dorsadesign_postgres_data
