@@ -4,49 +4,61 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.config import settings
 from app.database import test_connection
+from app.api import api_router
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ============================================
-# مدیریت چرخه حیات برنامه
-# ============================================
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """مدیریت رویدادهای Startup و Shutdown"""
-    
-    # 🚀 Startup - کدی که هنگام شروع اجرا می‌شود
-    logger.info("🚀 در حال راه‌اندازی dorsadesign.ir API...")
+    """Manage application startup and shutdown events"""
+    logger.info("🚀 Starting dorsadesign.ir API...")
     
     if test_connection():
-        logger.info("✅ اتصال به PostgreSQL برقرار شد")
+        logger.info("✅ Connected to PostgreSQL")
     else:
-        logger.error("❌ اتصال به PostgreSQL ناموفق!")
+        logger.error("❌ Failed to connect to PostgreSQL!")
     
-    yield  # ⬅️ برنامه در اینجا اجرا می‌شود
+    yield
     
-    # 🛑 Shutdown - کدی که هنگام توقف اجرا می‌شود
-    logger.info("🛑 در حال توقف dorsadesign.ir API...")
+    logger.info("🛑 Shutting down dorsadesign.ir API...")
+
 
 # ============================================
-# ایجاد اپلیکیشن با lifespan
+# ✅ Create FastAPI application with correct docs
 # ============================================
 
 app = FastAPI(
     title="dorsadesign.ir API",
-    description="وبسایت نمایش پروژه‌های معماری",
+    description="""
+🏛️ **dorsadesign.ir Architecture Portfolio API**
+
+This API provides access to architecture projects and content management.
+
+## Features:
+* 📋 List projects with filtering and pagination
+* 🔍 Get project details by slug
+* 🔐 Admin authentication (JWT)
+* 📝 Project management (CRUD)
+
+## Documentation:
+* **Swagger UI**: `/api/docs` - Interactive API testing
+* **ReDoc**: `/api/redoc` - Beautiful documentation
+""",
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
-    lifespan=lifespan,  # ⬅️ اضافه کردن lifespan
+    openapi_url="/api/openapi.json",
+    contact={
+        "name": "dorsadesign",
+        "url": "https://dorsadesign.ir",
+    },
+    lifespan=lifespan,
 )
 
-# ============================================
-# CORS
-# ============================================
-
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -56,7 +68,14 @@ app.add_middleware(
 )
 
 # ============================================
-# اندپوینت‌ها
+# ✅ Include API router
+# ============================================
+
+app.include_router(api_router, prefix="/api")
+
+
+# ============================================
+# Health Check Endpoints
 # ============================================
 
 @app.get("/")
@@ -65,24 +84,21 @@ async def root():
         "message": "🚀 dorsadesign.ir API",
         "version": "1.0.0",
         "status": "running",
-        "docs": "/api/docs"
+        "docs": "/api/docs",
+        "redoc": "/api/redoc"
     }
+
 
 @app.get("/api/health")
 async def health_check():
     if test_connection():
-        return {
-            "status": "healthy",
-            "database": "connected"
-        }
+        return {"status": "healthy", "database": "connected"}
     else:
-        return {
-            "status": "unhealthy",
-            "database": "disconnected"
-        }
+        return {"status": "unhealthy", "database": "disconnected"}
+
 
 # ============================================
-# اجرا
+# Run
 # ============================================
 
 if __name__ == "__main__":
