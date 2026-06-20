@@ -15,11 +15,19 @@ class AdminLogin(BaseModel):
     password: str = Field(..., min_length=6, description="Password")
 
 
+class AdminCreate(BaseModel):
+    """Admin creation request schema"""
+    username: str = Field(..., min_length=3, max_length=50, description="Username")
+    email: EmailStr = Field(..., description="Valid email address")
+    password: str = Field(..., min_length=6, description="Password")
+    full_name: Optional[str] = Field(None, max_length=255, description="Full name")
+
+
 class AdminRegister(BaseModel):
     """Admin registration request schema"""
     username: str = Field(..., min_length=3, max_length=50)
-    email: EmailStr = Field(..., description="Valid email address")
-    password: str = Field(..., min_length=6, description="Password")
+    email: EmailStr
+    password: str = Field(..., min_length=6)
     full_name: Optional[str] = Field(None, max_length=255)
 
 

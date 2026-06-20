@@ -4,8 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Settings:
-    """تنظیمات برنامه"""
+    """Application settings"""
     
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
@@ -13,6 +14,7 @@ class Settings:
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "change-me-in-production")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))  # ✅ Added
     
     # Server
     BACKEND_HOST: str = os.getenv("BACKEND_HOST", "0.0.0.0")
@@ -24,16 +26,16 @@ class Settings:
     
     # Upload
     UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "./uploads")
-    MAX_UPLOAD_SIZE: int = int(os.getenv("MAX_UPLOAD_SIZE", 10485760))  # 10MB
+    MAX_UPLOAD_SIZE: int = int(os.getenv("MAX_UPLOAD_SIZE", 10485760))
     
     @classmethod
     def validate(cls):
-        """اعتبارسنجی تنظیمات"""
+        """Validate settings"""
         if not cls.DATABASE_URL:
-            raise ValueError("❌ DATABASE_URL در فایل .env تنظیم نشده است!")
+            raise ValueError("❌ DATABASE_URL is not set in .env file!")
         if cls.SECRET_KEY == "change-me-in-production":
-            print("⚠️  هشدار: SECRET_KEY پیش‌فرض است! در تولید آن را تغییر دهید.")
+            print("⚠️  WARNING: SECRET_KEY is default! Change it in production.")
 
-# ایجاد نمونه از تنظیمات
+
 settings = Settings()
 settings.validate()
