@@ -41,6 +41,7 @@ Thumbs.db
 # Backend
 backend/uploads/
 backend/alembic/versions/*.pyc
+!backend/uploads/.gitkeep
 
 # Frontend
 frontend/node_modules/

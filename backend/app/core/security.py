@@ -43,7 +43,7 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
-    to_encode.update({"exp": expire, "iat": datetime.now(timezone.utc)})
+    to_encode.update({"exp": expire, "iat": datetime.now(timezone.utc), "type": "access"})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm="HS256")
 
 def create_refresh_token(data: Dict[str, Any]) -> str:
@@ -72,9 +72,11 @@ def validate_token(token: str, token_type: Optional[str] = None) -> Optional[Dic
         return None
     
     exp = payload.get("exp")
-    if exp and datetime.now(timezone.utc) > datetime.fromtimestamp(exp):
-        logger.warning("Token has expired")
-        return None
+    if exp:
+        exp_datetime = datetime.fromtimestamp(exp, tz=timezone.utc)
+        if datetime.now(timezone.utc) > exp_datetime:
+            logger.warning("Token has expired")
+            return None
     
     return payload
 
