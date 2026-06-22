@@ -234,3 +234,4 @@ async def upload_gallery_to_project(
         "count": len(saved_paths),
         "message": f"{len(saved_paths)} images uploaded and attached to project"
     }
+

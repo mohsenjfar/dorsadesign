@@ -1,7 +1,7 @@
 # backend/app/schemas/project.py
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 from uuid import UUID
 from app.models.project import ProjectStatus, ProjectType
 
@@ -72,11 +72,11 @@ class ProjectUpdate(BaseModel):
 class ProjectResponse(BaseModel):
     """Schema for project response with language support"""
     id: UUID
-    title: str = Field(..., description="Translated title based on language")
+    title: Union[str, Dict[str, str]] = Field(..., description="Title (translated or full JSON)")
     slug: str
-    description: Optional[str] = Field(None, description="Translated description")
-    full_description: Optional[str] = Field(None, description="Translated full description")
-    features: Optional[List[str]] = Field(None, description="Translated features list")
+    description: Optional[Union[str, Dict[str, str]]] = Field(None, description="Description")
+    full_description: Optional[Union[str, Dict[str, str]]] = Field(None, description="Full description")
+    features: Optional[Union[List[str], Dict[str, List[str]]]] = Field(None, description="Features")
     project_type: Optional[ProjectType] = None
     client_name: Optional[str] = None
     year: Optional[str] = None
@@ -92,22 +92,58 @@ class ProjectResponse(BaseModel):
     class Config:
         from_attributes = True
 
+    # ============================================
+    # ✅ Validator برای تبدیل خودکار JSON به رشته
+    # ============================================
+    @model_validator(mode='before')
+    @classmethod
+    def validate_translations(cls, data: Any) -> Any:
+        """Convert JSON fields to strings if they are dicts"""
+        if isinstance(data, dict):
+            # اگر title دیکشنری است، مقدار 'en' را استخراج کن
+            if 'title' in data and isinstance(data['title'], dict):
+                data['title'] = data['title'].get('en', '')
+            
+            if 'description' in data and isinstance(data['description'], dict):
+                data['description'] = data['description'].get('en', '')
+            
+            if 'full_description' in data and isinstance(data['full_description'], dict):
+                data['full_description'] = data['full_description'].get('en', '')
+            
+            if 'features' in data and isinstance(data['features'], dict):
+                data['features'] = data['features'].get('en', [])
+        
+        return data
+
 
 class ProjectListResponse(BaseModel):
     """Schema for project list response (lightweight)"""
     id: UUID
-    title: str = Field(..., description="Translated title")
+    title: Union[str, Dict[str, str]] = Field(..., description="Title")
     slug: str
-    description: Optional[str] = Field(None, description="Translated description")
+    description: Optional[Union[str, Dict[str, str]]] = Field(None, description="Description")
     cover_image: Optional[str] = None
     project_type: Optional[ProjectType] = None
     is_featured: bool
-    features: Optional[List[str]] = Field(default=[], description="Translated features list")
+    features: Optional[Union[List[str], Dict[str, List[str]]]] = Field(default=[], description="Features")
     views: int = Field(default=0, description="View count")
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+    # ✅ Validator برای تبدیل خودکار
+    @model_validator(mode='before')
+    @classmethod
+    def validate_translations(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if 'title' in data and isinstance(data['title'], dict):
+                data['title'] = data['title'].get('en', '')
+            if 'description' in data and isinstance(data['description'], dict):
+                data['description'] = data['description'].get('en', '')
+            if 'features' in data and isinstance(data['features'], dict):
+                data['features'] = data['features'].get('en', [])
+        return data
 
 
 class ProjectList(BaseModel):

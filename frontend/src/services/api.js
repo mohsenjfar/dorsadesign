@@ -8,15 +8,75 @@ const api = axios.create({
   },
 })
 
-// ✅ Interceptor برای ارسال زبان به بک‌اند
-api.interceptors.request.use((config) => {
-  const language = localStorage.getItem('i18nextLng') || 'en'
-  config.params = {
-    ...config.params,
-    language: language,
+// ============================================
+// ✅ Interceptor برای ارسال زبان و توکن
+// ============================================
+api.interceptors.request.use(
+  (config) => {
+    // اضافه کردن زبان
+    const language = localStorage.getItem('i18nextLng') || 'en'
+    config.params = {
+      ...config.params,
+      language: language,
+    }
+
+    // ✅ اضافه کردن توکن به هدر
+    const token = localStorage.getItem('access_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
   }
-  return config
-})
+)
+
+// ============================================
+// ✅ Interceptor برای مدیریت خطاهای 401
+// ============================================
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config
+
+    // اگر خطای 401 بود و قبلاً برای refresh تلاش نکرده بودیم
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      try {
+        const refreshToken = localStorage.getItem('refresh_token')
+        if (!refreshToken) {
+          throw new Error('No refresh token')
+        }
+
+        // درخواست توکن جدید
+        const response = await axios.post(
+          `${api.defaults.baseURL}/api/auth/refresh`,
+          { refresh_token: refreshToken }
+        )
+
+        const { access_token } = response.data
+        localStorage.setItem('access_token', access_token)
+        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+
+        // درخواست اصلی را با توکن جدید تکرار کن
+        originalRequest.headers.Authorization = `Bearer ${access_token}`
+        return api(originalRequest)
+      } catch (refreshError) {
+        // اگر رفرش ناموفق بود، کاربر را به لاگین هدایت کن
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        delete api.defaults.headers.common['Authorization']
+        window.location.href = '/admin/login'
+        return Promise.reject(refreshError)
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
 
 // ============================================
 // API Functions

@@ -232,8 +232,28 @@ async def create_project(
     project = project_crud.create(db, obj_in=project_in)
     logger.info(f"Project created by admin {current_admin['username']}: {project_in.title.get('en', '')}")
 
-    return ProjectResponse.model_validate(project)
-
+    # ✅ ساخت response_dict با تبدیل features به لیست
+    response_dict = {
+        "id": project.id,
+        "title": project.title.get('en', '') if isinstance(project.title, dict) else str(project.title),
+        "slug": project.slug,
+        "description": project.description.get('en', '') if isinstance(project.description, dict) else project.description,
+        "full_description": project.full_description.get('en', '') if isinstance(project.full_description, dict) else project.full_description,
+        "features": project.features.get('en', []) if isinstance(project.features, dict) else (project.features if isinstance(project.features, list) else []),
+        "project_type": project.project_type,
+        "client_name": project.client_name,
+        "year": project.year,
+        "area": project.area,
+        "status": project.status,
+        "cover_image": project.cover_image,
+        "gallery_images": project.gallery_images,
+        "is_featured": project.is_featured,
+        "views": project.views,
+        "created_at": project.created_at,
+        "updated_at": project.updated_at,
+    }
+    
+    return ProjectResponse.model_validate(response_dict)
 
 @router.put(
     "/{project_id}",

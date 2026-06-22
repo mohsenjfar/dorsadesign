@@ -6,6 +6,7 @@ from app.config import settings
 from app.database import test_connection
 from app.api import api_router
 import logging
+from fastapi.staticfiles import StaticFiles
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -57,6 +58,8 @@ This API provides access to architecture projects and content management.
     },
     lifespan=lifespan,
 )
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # CORS middleware
 app.add_middleware(

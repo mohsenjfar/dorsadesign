@@ -3,7 +3,8 @@
     "home": "Home",
     "projects": "Projects",
     "about": "About",
-    "contact": "Contact"
+    "contact": "Contact",
+    "admin_login": "Admin Login"
   },
   "hero": {
     "badge": "🏛️ Architecture & Design Studio",
@@ -93,5 +94,64 @@
     "views": "views",
     "square_meters": "m²",
     "related_projects": "Related Projects"
+  },
+  "admin": {
+    "login": {
+      "title": "Admin Login",
+      "username": "Username",
+      "username_placeholder": "Enter your username",
+      "password": "Password",
+      "password_placeholder": "Enter your password",
+      "button": "Sign In",
+      "loading": "Signing in...",
+      "footer": "Protected area - Authorized access only"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "logout": "Logout",
+      "welcome": "Welcome back,",
+      "add_project": "Add Project",
+      "projects_list": "List of projects will be displayed here.",
+      "total_projects": "Total Projects"
+    },
+    "project": {
+      "create_title": "Add New Project",
+      "cancel": "Cancel",
+      "save": "Save Project",
+      "saving": "Saving...",
+      "persian_section": "Persian (Farsi)",
+      "english_section": "English",
+      "general_info": "General Information",
+      "title": "Title",
+      "description": "Short Description",
+      "full_description": "Full Description",
+      "slug": "Slug (URL Identifier)",
+      "type": "Project Type",
+      "client": "Client Name",
+      "year": "Year",
+      "area": "Area (m²)",
+      "status": "Status",
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived",
+      "featured": "Featured Project",
+      "features": "Features",
+      "add_feature": "Add Feature",
+      "feature_placeholder": "Enter a feature...",
+      "images": "Images",
+      "cover_image": "Cover Image",
+      "change_image": "Change Image",
+      "click_to_upload": "Click to upload or drag and drop",
+      "supported_formats": "Supports: JPG, PNG, WebP (Max 10MB)",
+      "choose_image": "Choose Image",
+      "views": "Views",
+      "actions": "Actions",
+      "slug_hint": "Auto-generated from English title. Edit manually if needed.",
+      "gallery_images": "Gallery Images",
+      "click_to_upload_cover": "Click to upload cover image",
+      "click_to_upload_gallery": "Click to upload gallery images",
+      "choose_cover": "Choose Cover",
+      "choose_gallery": "Choose Gallery"
+    }
   }
 }

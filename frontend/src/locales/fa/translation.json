@@ -3,7 +3,8 @@
     "home": "خانه",
     "projects": "پروژه‌ها",
     "about": "درباره ما",
-    "contact": "تماس با ما"
+    "contact": "تماس با ما",
+    "admin_login": "ورود ادمین"
   },
   "hero": {
     "badge": "🏛️ استودیو معماری و طراحی",
@@ -93,5 +94,64 @@
     "views": "بازدید",
     "square_meters": "متر مربع",
     "related_projects": "پروژه‌های مرتبط"
+  },
+  "admin": {
+    "login": {
+      "title": "ورود به پنل مدیریت",
+      "username": "نام کاربری",
+      "username_placeholder": "نام کاربری خود را وارد کنید",
+      "password": "رمز عبور",
+      "password_placeholder": "رمز عبور خود را وارد کنید",
+      "button": "ورود",
+      "loading": "در حال ورود...",
+      "footer": "منطقه محافظت‌شده - دسترسی فقط برای مدیران"
+    },
+    "dashboard": {
+      "title": "داشبورد مدیریت",
+      "logout": "خروج",
+      "welcome": "خوش آمدید،",
+      "add_project": "افزودن پروژه",
+      "projects_list": "لیست پروژه‌ها در اینجا نمایش داده می‌شود.",
+      "total_projects": "تعداد کل پروژه‌ها"
+    },
+    "project": {
+      "create_title": "افزودن پروژه جدید",
+      "cancel": "انصراف",
+      "save": "ذخیره پروژه",
+      "saving": "در حال ذخیره...",
+      "persian_section": "بخش فارسی",
+      "english_section": "بخش انگلیسی",
+      "general_info": "اطلاعات عمومی",
+      "title": "عنوان",
+      "description": "توضیحات کوتاه",
+      "full_description": "توضیحات کامل",
+      "slug": "شناسه یکتا (اسلاگ)",
+      "type": "نوع پروژه",
+      "client": "نام کارفرما",
+      "year": "سال اجرا",
+      "area": "مساحت (متر مربع)",
+      "status": "وضعیت",
+      "draft": "پیش‌نویس",
+      "published": "منتشر شده",
+      "archived": "بایگانی شده",
+      "featured": "پروژه ویژه",
+      "features": "امکانات",
+      "add_feature": "افزودن ویژگی",
+      "feature_placeholder": "یک ویژگی وارد کنید...",
+      "images": "تصاویر",
+      "cover_image": "تصویر کاور",
+      "change_image": "تغییر تصویر",
+      "click_to_upload": "برای آپلود کلیک کنید یا بکشید و رها کنید",
+      "supported_formats": "پشتیبانی: JPG، PNG، WebP (حداکثر ۱۰ مگابایت)",
+      "choose_image": "انتخاب تصویر",
+      "views": "بازدید",
+      "actions": "عملیات",
+      "slug_hint": "به صورت خودکار از عنوان انگلیسی تولید می‌شود. در صورت نیاز دستی ویرایش کنید.",
+      "gallery_images": "تصاویر گالری",
+      "click_to_upload_cover": "برای آپلود تصویر کاور کلیک کنید",
+      "click_to_upload_gallery": "برای آپلود تصاویر گالری کلیک کنید",
+      "choose_cover": "انتخاب کاور",
+      "choose_gallery": "انتخاب گالری"
+    }
   }
 }
