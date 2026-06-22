@@ -1,9 +1,25 @@
 // frontend/src/components/home/FilterBar.jsx
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'  // ✅ اضافه کنید
 import { useProjectTypes } from '../../hooks/useProjects'
 
 const FilterBar = ({ activeFilter, onFilterChange }) => {
+  const { t } = useTranslation()
   const { types, loading } = useProjectTypes()
+
+  // اگر types از API نمی‌آید، این را به عنوان fallback استفاده کنید
+  const fallbackTypes = [
+      { value: 'all', labelKey: 'projects.filter_all' },
+      { value: 'residential', labelKey: 'projects.filter_residential' },
+      { value: 'commercial', labelKey: 'projects.filter_commercial' },
+      { value: 'office', labelKey: 'projects.filter_office' },
+      { value: 'villa', labelKey: 'projects.filter_villa' },
+      { value: 'cultural', labelKey: 'projects.filter_cultural' },
+      { value: 'educational', labelKey: 'projects.filter_educational' },
+      { value: 'other', labelKey: 'projects.filter_other' },
+    ]
+
+  const displayTypes = types.length > 0 ? types : fallbackTypes
 
   if (loading) {
     return (
@@ -15,7 +31,7 @@ const FilterBar = ({ activeFilter, onFilterChange }) => {
 
   return (
     <div className="flex flex-wrap gap-2 md:gap-3 justify-center mb-8">
-      {types.map((type) => (
+      {displayTypes.map((type) => (
         <motion.button
           key={type.value}
           onClick={() => onFilterChange(type.value === 'all' ? null : type.value)}
@@ -27,7 +43,7 @@ const FilterBar = ({ activeFilter, onFilterChange }) => {
               : 'bg-gray-100 dark:bg-dark-300 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-400'
           }`}
         >
-          {type.label}
+          {t(type.labelKey)}
         </motion.button>
       ))}
     </div>

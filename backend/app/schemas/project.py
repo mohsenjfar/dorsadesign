@@ -1,34 +1,47 @@
 # backend/app/schemas/project.py
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from uuid import UUID
 from app.models.project import ProjectStatus, ProjectType
 
 
 # ============================================
-# Base Schema
+# Multilingual Base Models
+# ============================================
+
+class MultiLingualText(BaseModel):
+    """Model for multilingual text fields"""
+    en: str = Field(..., description="English text")
+    fa: str = Field(..., description="Persian text")
+
+
+class MultiLingualList(BaseModel):
+    """Model for multilingual list fields"""
+    en: List[str] = Field(default=[], description="English list")
+    fa: List[str] = Field(default=[], description="Persian list")
+
+
+# ============================================
+# Project Schemas
 # ============================================
 
 class ProjectBase(BaseModel):
-    """Base project schema with common fields"""
-    title: str = Field(..., min_length=3, max_length=255, description="Project title")
-    slug: str = Field(..., min_length=3, max_length=255, description="Unique URL identifier")
-    description: Optional[str] = Field(None, description="Short description")
-    full_description: Optional[str] = Field(None, description="Full project description")
-    project_type: Optional[ProjectType] = Field(None, description="Type of project")
-    client_name: Optional[str] = Field(None, max_length=255, description="Client name")
-    year: Optional[str] = Field(None, max_length=20, description="Project year")
-    area: Optional[str] = Field(None, max_length=50, description="Area in square meters")
-    status: ProjectStatus = Field(default=ProjectStatus.DRAFT, description="Publication status")
-    cover_image: Optional[str] = Field(None, max_length=500, description="Cover image URL")
-    gallery_images: Optional[str] = Field(None, description="Gallery image URLs (comma-separated)")
-    is_featured: bool = Field(default=False, description="Show in featured section")
+    """Base project schema with multilingual fields"""
+    title: MultiLingualText
+    slug: str = Field(..., min_length=3, max_length=255)
+    description: Optional[MultiLingualText] = None
+    full_description: Optional[MultiLingualText] = None
+    features: Optional[MultiLingualList] = None
+    project_type: Optional[ProjectType] = None
+    client_name: Optional[str] = Field(None, max_length=255)
+    year: Optional[str] = Field(None, max_length=20)
+    area: Optional[str] = Field(None, max_length=50)
+    status: ProjectStatus = Field(default=ProjectStatus.DRAFT)
+    cover_image: Optional[str] = Field(None, max_length=500)
+    gallery_images: Optional[str] = None
+    is_featured: bool = Field(default=False)
 
-
-# ============================================
-# Create Schemas
-# ============================================
 
 class ProjectCreate(ProjectBase):
     """Schema for creating a new project"""
@@ -37,10 +50,11 @@ class ProjectCreate(ProjectBase):
 
 class ProjectUpdate(BaseModel):
     """Schema for updating an existing project"""
-    title: Optional[str] = Field(None, min_length=3, max_length=255)
+    title: Optional[MultiLingualText] = None
     slug: Optional[str] = Field(None, min_length=3, max_length=255)
-    description: Optional[str] = None
-    full_description: Optional[str] = None
+    description: Optional[MultiLingualText] = None
+    full_description: Optional[MultiLingualText] = None
+    features: Optional[MultiLingualList] = None
     project_type: Optional[ProjectType] = None
     client_name: Optional[str] = Field(None, max_length=255)
     year: Optional[str] = Field(None, max_length=20)
@@ -52,31 +66,46 @@ class ProjectUpdate(BaseModel):
 
 
 # ============================================
-# Response Schemas
+# Response Schemas (با پشتیبانی از زبان)
 # ============================================
 
-class ProjectResponse(ProjectBase):
-    """Schema for project response (full details)"""
+class ProjectResponse(BaseModel):
+    """Schema for project response with language support"""
     id: UUID
+    title: str = Field(..., description="Translated title based on language")
+    slug: str
+    description: Optional[str] = Field(None, description="Translated description")
+    full_description: Optional[str] = Field(None, description="Translated full description")
+    features: Optional[List[str]] = Field(None, description="Translated features list")
+    project_type: Optional[ProjectType] = None
+    client_name: Optional[str] = None
+    year: Optional[str] = None
+    area: Optional[str] = None
+    status: ProjectStatus
+    cover_image: Optional[str] = None
+    gallery_images: Optional[str] = None
+    is_featured: bool
     views: int
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
-        from_attributes = True  # Pydantic v2 (formerly orm_mode)
+        from_attributes = True
 
 
 class ProjectListResponse(BaseModel):
     """Schema for project list response (lightweight)"""
     id: UUID
-    title: str
+    title: str = Field(..., description="Translated title")
     slug: str
-    description: Optional[str]
-    cover_image: Optional[str]
-    project_type: Optional[ProjectType]
+    description: Optional[str] = Field(None, description="Translated description")
+    cover_image: Optional[str] = None
+    project_type: Optional[ProjectType] = None
     is_featured: bool
+    features: Optional[List[str]] = Field(default=[], description="Translated features list")
+    views: int = Field(default=0, description="View count")
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
 

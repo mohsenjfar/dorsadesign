@@ -1,6 +1,6 @@
 # backend/app/models/project.py
 from sqlalchemy import Column, String, Text, Boolean, DateTime, Enum, Integer
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSON  # ✅ JSON را اضافه کنید
 from sqlalchemy.sql import func
 from app.database import Base
 import uuid
@@ -16,17 +16,17 @@ class ProjectStatus(str, enum.Enum):
 
 class ProjectType(str, enum.Enum):
     """Architecture project types"""
-    RESIDENTIAL = "residential"      # مسکونی
-    COMMERCIAL = "commercial"        # تجاری
-    OFFICE = "office"                # اداری
-    VILLA = "villa"                  # ویلایی
-    CULTURAL = "cultural"            # فرهنگی
-    EDUCATIONAL = "educational"      # آموزشی
-    OTHER = "other"                  # سایر
+    RESIDENTIAL = "residential"
+    COMMERCIAL = "commercial"
+    OFFICE = "office"
+    VILLA = "villa"
+    CULTURAL = "cultural"
+    EDUCATIONAL = "educational"
+    OTHER = "other"
 
 
 class Project(Base):
-    """Architecture project model"""
+    """Architecture project model with multilingual support"""
     __tablename__ = "projects"
 
     # ============================================
@@ -40,11 +40,11 @@ class Project(Base):
         index=True
     )
     
+    # ✅ فیلدهای چندزبانه به صورت JSON
     title = Column(
-        String(255),
+        JSON,
         nullable=False,
-        index=True,
-        comment="Project title"
+        comment="Multilingual title: {'en': '...', 'fa': '...'}"
     )
     
     slug = Column(
@@ -56,19 +56,25 @@ class Project(Base):
     )
     
     description = Column(
-        Text,
+        JSON,
         nullable=True,
-        comment="Short description"
+        comment="Multilingual short description: {'en': '...', 'fa': '...'}"
     )
     
     full_description = Column(
-        Text,
+        JSON,
         nullable=True,
-        comment="Full project description"
+        comment="Multilingual full description: {'en': '...', 'fa': '...'}"
+    )
+    
+    features = Column(
+        JSON,
+        nullable=True,
+        comment="Multilingual features: {'en': ['feat1', 'feat2'], 'fa': ['...']}"
     )
 
     # ============================================
-    # Project Information
+    # Project Information (غیر چندزبانه)
     # ============================================
     
     project_type = Column(
@@ -113,7 +119,7 @@ class Project(Base):
     )
     
     gallery_images = Column(
-        String(500),  # Simple approach, comma-separated URLs
+        String(500),
         nullable=True,
         comment="Gallery image URLs (comma-separated)"
     )
@@ -156,11 +162,15 @@ class Project(Base):
     )
 
     # ============================================
-    # Methods
+    # Helper Methods
     # ============================================
     
-    def __repr__(self):
-        return f"<Project {self.title}>"
+    def get_translation(self, field: str, language: str = 'en') -> str:
+        """Get translated value for a field"""
+        value = getattr(self, field, None)
+        if isinstance(value, dict):
+            return value.get(language, value.get('en', ''))
+        return value
     
-    def __str__(self):
-        return self.title
+    def __repr__(self):
+        return f"<Project {self.get_translation('title')}>"

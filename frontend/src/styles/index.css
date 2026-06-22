@@ -1,5 +1,6 @@
 /* frontend/src/index.css */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+@import '@fontsource/vazirmatn';
 
 @tailwind base;
 @tailwind components;
@@ -47,4 +48,96 @@
 }
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* ============================================
+   Scroll Animation
+   ============================================ */
+@keyframes scroll-down {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.animate-scroll-down {
+  animation: scroll-down 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   Pulse Animation for Badge (Optional)
+   ============================================ */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ============================================
+   Smooth Scroll
+   ============================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================
+   RTL Support
+   ============================================ */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .space-x-2 > * + * {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+[dir="rtl"] .space-x-8 > * + * {
+  margin-right: 2rem;
+  margin-left: 0;
+}
+
+/* ============================================
+   RTL Support with Vazirmatn
+   ============================================ */
+[dir="rtl"] {
+  font-family: 'Vazirmatn', 'Inter', sans-serif;
+  text-align: right;
+}
+
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .space-x-2 > * + * {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+[dir="rtl"] .space-x-8 > * + * {
+  margin-right: 2rem;
+  margin-left: 0;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
 }

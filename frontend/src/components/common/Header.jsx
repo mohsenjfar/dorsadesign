@@ -1,19 +1,91 @@
 // frontend/src/components/common/Header.jsx
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { FiMenu, FiX, FiSun, FiMoon } from 'react-icons/fi'
+import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { FiMenu, FiX, FiSun, FiMoon, FiGlobe } from 'react-icons/fi'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isLangOpen, setIsLangOpen] = useState(false)
   const { darkMode, toggleDarkMode } = useTheme()
+  const { t } = useTranslation()
+  const { currentLanguage, changeLanguage } = useLanguage()
+  const navigate = useNavigate()
 
+  // ============================================
+  // رفتن به خانه (هر صفحه‌ای که باشی)
+  // ============================================
+  const goToHome = (e) => {
+    e?.preventDefault?.()
+    setIsMenuOpen(false)
+    if (window.location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      navigate('/')
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 100)
+    }
+  }
+
+  // ============================================
+  // اسکرول به بخش پروژه‌ها
+  // ============================================
+  const scrollToProjects = (e) => {
+    e?.preventDefault?.()
+    setIsMenuOpen(false)
+    if (window.location.pathname === '/') {
+      const projectsSection = document.getElementById('projects')
+      if (projectsSection) {
+        projectsSection.scrollIntoView({ behavior: 'smooth' })
+      }
+    } else {
+      navigate('/')
+      setTimeout(() => {
+        const projectsSection = document.getElementById('projects')
+        if (projectsSection) {
+          projectsSection.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 150)
+    }
+  }
+
+  // ============================================
+  // بستن منو
+  // ============================================
+  const closeMenu = () => setIsMenuOpen(false)
+
+  // ============================================
+  // تغییر زبان
+  // ============================================
+  const handleLanguageChange = (lang) => {
+    changeLanguage(lang)
+    setIsLangOpen(false)
+  }
+
+  // ============================================
+  // لیست زبان‌ها
+  // ============================================
+  const languages = [
+    { code: 'en', label: 'English', flag: '🇬🇧' },
+    { code: 'fa', label: 'فارسی', flag: '🇮🇷' },
+  ]
+
+  // ============================================
+  // رندر هدر
+  // ============================================
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-dark-100/80 backdrop-blur-md border-b border-gray-200 dark:border-dark-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* ===== Logo ===== */}
-          <Link to="/" className="flex items-center space-x-2">
+          {/* ===== لوگو ===== */}
+          <Link
+            to="/"
+            onClick={goToHome}
+            className="flex items-center space-x-2 rtl:space-x-reverse"
+          >
             <span className="text-2xl font-display font-bold text-primary-700 dark:text-primary-400">
               dorsa
             </span>
@@ -22,37 +94,73 @@ const Header = () => {
             </span>
           </Link>
 
-          {/* ===== Desktop Navigation ===== */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+          {/* ===== منوی دسکتاپ ===== */}
+          <nav className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
+            <button
+              onClick={goToHome}
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer bg-transparent border-none"
             >
-              Home
-            </Link>
-            <Link
-              to="/#projects"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              {t('nav.home')}
+            </button>
+            <button
+              onClick={scrollToProjects}
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer bg-transparent border-none"
             >
-              Projects
-            </Link>
+              {t('nav.projects')}
+            </button>
             <Link
               to="/about"
+              onClick={closeMenu}
               className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
-              About
+              {t('nav.about')}
             </Link>
             <Link
               to="/contact"
+              onClick={closeMenu}
               className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
-              Contact
+              {t('nav.contact')}
             </Link>
           </nav>
 
-          {/* ===== Right Section ===== */}
-          <div className="flex items-center space-x-4">
-            {/* Dark Mode Toggle */}
+          {/* ===== بخش راست هدر ===== */}
+          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+            {/* دکمه تغییر زبان */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors flex items-center gap-1"
+                aria-label="Change language"
+              >
+                <FiGlobe className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
+                  {currentLanguage === 'fa' ? 'فا' : 'En'}
+                </span>
+              </button>
+
+              {/* منوی زبان */}
+              {isLangOpen && (
+                <div className="absolute right-0 mt-2 py-2 w-40 bg-white dark:bg-dark-200 rounded-xl shadow-lg border border-gray-200 dark:border-dark-300">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleLanguageChange(lang.code)}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors flex items-center gap-2 ${
+                        currentLanguage === lang.code
+                          ? 'text-primary-600 dark:text-primary-400 font-medium'
+                          : 'text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      <span>{lang.flag}</span>
+                      {lang.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* دکمه دارک/لایت */}
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors"
@@ -65,52 +173,50 @@ const Header = () => {
               )}
             </button>
 
-            {/* Mobile Menu Toggle */}
+            {/* دکمه منوی موبایل */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
-                <FiX className="w-6 h-6" />
+                <FiX className="w-6 h-6 text-gray-700 dark:text-gray-300" />
               ) : (
-                <FiMenu className="w-6 h-6" />
+                <FiMenu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
               )}
             </button>
           </div>
         </div>
 
-        {/* ===== Mobile Navigation ===== */}
+        {/* ===== منوی موبایل ===== */}
         {isMenuOpen && (
           <nav className="md:hidden py-4 border-t border-gray-200 dark:border-dark-300">
             <div className="flex flex-col space-y-4">
-              <Link
-                to="/"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              <button
+                onClick={goToHome}
+                className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer bg-transparent border-none text-left"
               >
-                Home
-              </Link>
-              <Link
-                to="/#projects"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                {t('nav.home')}
+              </button>
+              <button
+                onClick={scrollToProjects}
+                className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer bg-transparent border-none text-left"
               >
-                Projects
-              </Link>
+                {t('nav.projects')}
+              </button>
               <Link
                 to="/about"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMenu}
                 className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
-                About
+                {t('nav.about')}
               </Link>
               <Link
                 to="/contact"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMenu}
                 className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
-                Contact
+                {t('nav.contact')}
               </Link>
             </div>
           </nav>

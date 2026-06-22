@@ -1,8 +1,10 @@
 // frontend/src/hooks/useProjects.js
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getProjects, getFeaturedProjects, getProjectTypes } from '../services/api'
 
 export const useProjects = (initialFilters = {}) => {
+  const { i18n } = useTranslation()
   const [projects, setProjects] = useState([])
   const [featured, setFeatured] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,9 +22,11 @@ export const useProjects = (initialFilters = {}) => {
     setLoading(true)
     setError(null)
     try {
+      const language = i18n.language || 'en'
       const params = {
         skip: (pagination.page - 1) * pagination.pageSize,
         limit: pagination.pageSize,
+        language: language,
         ...newFilters,
       }
       const data = await getProjects(params)
@@ -39,7 +43,7 @@ export const useProjects = (initialFilters = {}) => {
     } finally {
       setLoading(false)
     }
-  }, [pagination.page, pagination.pageSize, filters])
+  }, [pagination.page, pagination.pageSize, filters, i18n.language])
 
   // دریافت پروژه‌های ویژه
   const fetchFeatured = useCallback(async () => {

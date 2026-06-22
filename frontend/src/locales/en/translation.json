@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "hero": {
+    "badge": "🏛️ Architecture & Design Studio",
+    "title": "dorsadesign",
+    "subtitle": "Where Vision Meets Architecture",
+    "description": "Exploring the intersection of form, function, and beauty through thoughtful architectural design.",
+    "cta_projects": "View Our Projects",
+    "cta_about": "Learn More",
+    "scroll": "Scroll"
+  },
+  "projects": {
+    "title": "Architecture Projects",
+    "subtitle": "Browse our portfolio of architectural works",
+    "filter_all": "All",
+    "filter_residential": "Residential",
+    "filter_commercial": "Commercial",
+    "filter_office": "Office",
+    "filter_villa": "Villa",
+    "filter_cultural": "Cultural",
+    "filter_educational": "Educational",
+    "filter_other": "Other",
+    "loading": "Loading...",
+    "no_projects": "No projects found",
+    "error": "Error loading projects",
+    "view_details": "View Details"
+  },
+  "footer": {
+    "tagline": "Architecture & Design Portfolio",
+    "copyright": "All rights reserved."
+  },
+  "about": {
+    "title": "About Us",
+    "story": {
+      "title": "The dorsadesign Story",
+      "paragraph1": "dorsadesign is an architecture design studio dedicated to creating inspiring and functional spaces with a modern and creative approach.",
+      "paragraph2": "With a team of professional architects and designers, we create projects that are not only beautiful but also sustainable and environmentally friendly."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "text": "Creating spaces that transform lives. We combine art, science, and technology to create timeless architecture."
+    },
+    "stats": {
+      "projects": "Completed Projects",
+      "clients": "Happy Clients",
+      "awards": "Design Awards",
+      "experience": "Years of Experience"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with us",
+    "form": {
+      "title": "Send a Message",
+      "name": "Full Name",
+      "name_required": "Name is required",
+      "name_placeholder": "Enter your full name",
+      "email": "Email",
+      "email_required": "Email is required",
+      "email_invalid": "Invalid email address",
+      "email_placeholder": "Enter your email",
+      "subject": "Subject",
+      "subject_placeholder": "Enter subject",
+      "message": "Message",
+      "message_required": "Message is required",
+      "message_placeholder": "Write your message...",
+      "send": "Send Message",
+      "sending": "Sending..."
+    },
+    "info": {
+      "title": "Contact Information",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "address_text": "Tehran, Valiasr St..."
+    },
+    "success": "Your message has been sent successfully!",
+    "error": "Error sending message. Please try again.",
+    "map": "Map"
+  },
+  "project": {
+    "back": "Back",
+    "back_to_home": "Back to Home",
+    "not_found": "Project not found",
+    "error_loading": "Error loading project",
+    "features": "Features",
+    "gallery": "Gallery",
+    "views": "views",
+    "square_meters": "m²",
+    "related_projects": "Related Projects"
+  }
+}

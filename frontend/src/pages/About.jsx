@@ -1,13 +1,16 @@
 // frontend/src/pages/About.jsx
 import { motion } from 'framer-motion'
 import { FiAward, FiUsers, FiBriefcase, FiHeart } from 'react-icons/fi'
+import { useTranslation } from 'react-i18next'
 
 const About = () => {
+  const { t } = useTranslation()
+
   const stats = [
-    { icon: FiBriefcase, label: 'پروژه‌های انجام شده', value: '۵۰+' },
-    { icon: FiUsers, label: 'مشتریان راضی', value: '۳۰+' },
-    { icon: FiAward, label: 'جوایز طراحی', value: '۱۲' },
-    { icon: FiHeart, label: 'سال‌های تجربه', value: '۸' },
+    { icon: FiBriefcase, label: t('about.stats.projects'), value: '۵۰+' },
+    { icon: FiUsers, label: t('about.stats.clients'), value: '۳۰+' },
+    { icon: FiAward, label: t('about.stats.awards'), value: '۱۲' },
+    { icon: FiHeart, label: t('about.stats.experience'), value: '۸' },
   ]
 
   return (
@@ -20,7 +23,7 @@ const About = () => {
       {/* Header */}
       <div className="text-center mb-16">
         <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900 dark:text-white">
-          درباره ما
+          {t('about.title')}
         </h1>
         <div className="w-20 h-1 bg-primary-600 mx-auto mt-4 rounded-full" />
       </div>
@@ -33,16 +36,13 @@ const About = () => {
           transition={{ delay: 0.2 }}
         >
           <h2 className="text-2xl font-display font-semibold text-gray-900 dark:text-white mb-4">
-            داستان dorsadesign
+            {t('about.story.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
-            dorsadesign یک استودیوی طراحی معماری است که به خلق فضاهای الهام‌بخش و کاربردی 
-            با رویکردی مدرن و خلاقانه می‌پردازد. ما با تیمی از معماران و طراحان حرفه‌ای، 
-            پروژه‌هایی را طراحی می‌کنیم که نه تنها زیبا، بلکه پایدار و هماهنگ با محیط زیست هستند.
+            {t('about.story.paragraph1')}
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            فلسفه ما این است که هر پروژه داستانی منحصربه‌فرد دارد و ما با گوش دادن به نیازهای 
-            مشتریان، این داستان را به زبان معماری ترجمه می‌کنیم.
+            {t('about.story.paragraph2')}
           </p>
         </motion.div>
 
@@ -53,11 +53,10 @@ const About = () => {
           className="bg-primary-50 dark:bg-dark-200 rounded-2xl p-8"
         >
           <h3 className="text-xl font-display font-semibold text-gray-900 dark:text-white mb-4">
-            چشم‌انداز ما
+            {t('about.vision.title')}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            ایجاد فضاهایی که زندگی را متحول می‌کنند. ما به دنبال ترکیب هنر، علم و تکنولوژی 
-            برای خلق معماری‌هایی هستیم که فراتر از زمان باشند و هویت مکانی را تعریف کنند.
+            {t('about.vision.text')}
           </p>
         </motion.div>
       </div>

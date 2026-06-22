@@ -1,6 +1,6 @@
 # backend/app/crud/project.py
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, or_
 from typing import Optional, List, Tuple
 from uuid import UUID
 from app.models.project import Project, ProjectStatus, ProjectType
@@ -8,7 +8,7 @@ from app.schemas.project import ProjectCreate, ProjectUpdate
 
 
 class ProjectCRUD:
-    """CRUD operations for Project model"""
+    """CRUD operations for Project model with multilingual support"""
 
     def get(self, db: Session, project_id: UUID) -> Optional[Project]:
         """Get a single project by ID"""
@@ -28,9 +28,11 @@ class ProjectCRUD:
         status: Optional[ProjectStatus] = None,
         is_featured: Optional[bool] = None,
         search: Optional[str] = None,
+        language: str = 'en',  # ✅ برای جستجو در JSON
     ) -> Tuple[List[Project], int]:
         """
         Get multiple projects with filtering and pagination
+        
         Returns: (list of projects, total count)
         """
         query = db.query(Project)
@@ -48,11 +50,17 @@ class ProjectCRUD:
         if is_featured is not None:
             query = query.filter(Project.is_featured == is_featured)
 
+        # ✅ جستجو در فیلدهای JSON با استفاده از PostgreSQL JSONB
         if search:
             search_term = f"%{search}%"
             query = query.filter(
-                (Project.title.ilike(search_term)) |
-                (Project.description.ilike(search_term))
+                or_(
+                    Project.title[language].astext.ilike(search_term),
+                    Project.description[language].astext.ilike(search_term),
+                    # جستجو در هر دو زبان به عنوان fallback
+                    Project.title['en'].astext.ilike(search_term),
+                    Project.title['fa'].astext.ilike(search_term),
+                )
             )
 
         # Get total count before pagination
@@ -77,12 +85,14 @@ class ProjectCRUD:
         return projects
 
     def create(self, db: Session, *, obj_in: ProjectCreate) -> Project:
-        """Create a new project"""
+        """Create a new project with multilingual data"""
         db_obj = Project(
-            title=obj_in.title,
+            # ✅ ذخیره به صورت دیکشنری برای فیلدهای JSON
+            title=obj_in.title.model_dump(),
             slug=obj_in.slug,
-            description=obj_in.description,
-            full_description=obj_in.full_description,
+            description=obj_in.description.model_dump() if obj_in.description else None,
+            full_description=obj_in.full_description.model_dump() if obj_in.full_description else None,
+            features=obj_in.features.model_dump() if obj_in.features else None,
             project_type=obj_in.project_type,
             client_name=obj_in.client_name,
             year=obj_in.year,
@@ -104,11 +114,20 @@ class ProjectCRUD:
         db_obj: Project,
         obj_in: ProjectUpdate
     ) -> Project:
-        """Update an existing project"""
+        """Update an existing project with multilingual data"""
         update_data = obj_in.model_dump(exclude_unset=True)
 
         for field, value in update_data.items():
-            setattr(db_obj, field, value)
+            if field in ['title', 'description', 'full_description', 'features']:
+                # ✅ برای فیلدهای JSON، اگر value یک شیء Pydantic است، آن را به dict تبدیل کن
+                if hasattr(value, 'model_dump'):
+                    setattr(db_obj, field, value.model_dump())
+                elif isinstance(value, dict):
+                    setattr(db_obj, field, value)
+                else:
+                    setattr(db_obj, field, value)
+            else:
+                setattr(db_obj, field, value)
 
         db.add(db_obj)
         db.commit()

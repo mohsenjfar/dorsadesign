@@ -9,8 +9,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'display': ['Playfair Display', 'serif'],
-        'body': ['Inter', 'sans-serif'],
+        sans: ['Vazirmatn', 'Inter', 'sans-serif'],
+        display: ['Vazirmatn', 'Playfair Display', 'serif'],
+        body: ['Vazirmatn', 'Inter', 'sans-serif'],
       },
       colors: {
         primary: {

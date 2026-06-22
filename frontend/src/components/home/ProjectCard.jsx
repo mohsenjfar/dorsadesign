@@ -1,19 +1,21 @@
 // frontend/src/components/home/ProjectCard.jsx
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { FiEye } from 'react-icons/fi'
+import { FiEye, FiTag } from 'react-icons/fi'
+import { useTranslation } from 'react-i18next'
 
 const ProjectCard = ({ project, index }) => {
-  const { title, slug, description, cover_image, project_type, views } = project
+  const { t } = useTranslation()
+  const { title, slug, description, cover_image, project_type, views, features } = project
 
   const typeLabels = {
-    residential: 'مسکونی',
-    commercial: 'تجاری',
-    office: 'اداری',
-    villa: 'ویلایی',
-    cultural: 'فرهنگی',
-    educational: 'آموزشی',
-    other: 'سایر',
+    residential: t('projects.filter_residential'),
+    commercial: t('projects.filter_commercial'),
+    office: t('projects.filter_office'),
+    villa: t('projects.filter_villa'),
+    cultural: t('projects.filter_cultural'),
+    educational: t('projects.filter_educational'),
+    other: t('projects.filter_other'),
   }
 
   return (
@@ -22,11 +24,11 @@ const ProjectCard = ({ project, index }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8 }}
-      className="group bg-white dark:bg-dark-200 rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300"
+      className="group bg-white dark:bg-dark-200 rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 h-full flex flex-col"
     >
-      <Link to={`/projects/${slug}`} className="block">
+      <Link to={`/projects/${slug}`} className="block h-full flex flex-col">
         {/* Image */}
-        <div className="relative overflow-hidden aspect-[4/3] bg-gray-200 dark:bg-dark-300">
+        <div className="relative overflow-hidden aspect-[4/3] bg-gray-200 dark:bg-dark-300 flex-shrink-0">
           {cover_image ? (
             <img
               src={cover_image}
@@ -51,22 +53,44 @@ const ProjectCard = ({ project, index }) => {
         </div>
 
         {/* Content */}
-        <div className="p-5">
+        <div className="p-5 flex-grow flex flex-col">
           <h3 className="text-lg font-display font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-1">
             {title}
           </h3>
+          
           {description && (
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2 flex-grow">
               {description}
             </p>
           )}
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+
+          {/* ✅ نمایش features در کارت */}
+          {features && features.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1">
+              {features.slice(0, 2).map((feature, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-xs rounded-full"
+                >
+                  <FiTag className="w-3 h-3" />
+                  {feature}
+                </span>
+              ))}
+              {features.length > 2 && (
+                <span className="text-xs text-gray-400 dark:text-gray-500">
+                  +{features.length - 2}
+                </span>
+              )}
+            </div>
+          )}
+          
+          <div className="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-dark-300 pt-3">
             <span className="flex items-center gap-1">
               <FiEye className="w-4 h-4" />
-              {views || 0}
+              {views ?? 0}
             </span>
             <span className="text-primary-600 dark:text-primary-400 group-hover:translate-x-1 transition-transform">
-              مشاهده →
+              {t('projects.view_details')} →
             </span>
           </div>
         </div>
