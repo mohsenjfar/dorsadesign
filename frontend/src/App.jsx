@@ -12,6 +12,8 @@ import ProjectDetail from './pages/ProjectDetail'
 import AdminLogin from './pages/admin/Login'
 import AdminDashboard from './pages/admin/Dashboard'
 import CreateProject from './pages/admin/CreateProject'
+import EditProject from './pages/admin/EditProject'
+import Profile from './pages/admin/Profile'
 
 function App() {
   return (
@@ -26,7 +28,7 @@ function App() {
           <AuthProvider>
             <Routes>
               {/* ============================================
-                  Public Routes (با هدر و فوتر)
+                  Public Routes
                   ============================================ */}
               <Route path="/" element={<Layout><Home /></Layout>} />
               <Route path="/about" element={<Layout><About /></Layout>} />
@@ -36,11 +38,8 @@ function App() {
               {/* ============================================
                   Admin Routes
                   ============================================ */}
-              
-              {/* ✅ صفحه لاگین با هدر و فوتر */}
               <Route path="/admin/login" element={<Layout><AdminLogin /></Layout>} />
               
-              {/* ✅ صفحات ادمین با هدر و فوتر */}
               <Route path="/admin/dashboard" element={
                 <ProtectedRoute>
                   <Layout>
@@ -53,6 +52,22 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <CreateProject />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/admin/projects/edit/:id" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <EditProject />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/admin/profile" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Profile />
                   </Layout>
                 </ProtectedRoute>
               } />

@@ -16,6 +16,7 @@ from app.schemas.admin import (
     TokenResponse,
     AdminResponse,
     AdminCreate,
+    AdminUpdate
 )
 
 from app.models.admin import Admin 
@@ -272,4 +273,64 @@ async def create_first_admin(
     # Create admin
     admin = admin_crud.create(db, obj_in=admin_data)
     
+    return admin
+
+@router.put("/profile", response_model=AdminResponse)
+async def update_admin_profile(
+    profile_in: AdminUpdate,
+    db: Session = Depends(get_db),
+    current_admin: dict = Depends(get_current_user),
+):
+    """
+    به‌روزرسانی اطلاعات ادمین (فقط ادمین)
+    
+    - تغییر نام کامل
+    - تغییر ایمیل
+    - تغییر رمز عبور (با تأیید رمز فعلی)
+    """
+    from uuid import UUID
+    from app.core.security import verify_password, get_password_hash
+
+    # دریافت ادمین از دیتابیس
+    admin = admin_crud.get(db, UUID(current_admin["user_id"]))
+    if not admin:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Admin not found",
+        )
+
+    # ============================================
+    # تغییر رمز عبور (اگر درخواست شده)
+    # ============================================
+    if profile_in.current_password and profile_in.new_password:
+        # بررسی رمز فعلی
+        if not verify_password(profile_in.current_password, admin.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Current password is incorrect",
+            )
+        # هش کردن رمز جدید
+        admin.hashed_password = get_password_hash(profile_in.new_password)
+
+    # ============================================
+    # به‌روزرسانی سایر فیلدها
+    # ============================================
+    if profile_in.full_name is not None:
+        admin.full_name = profile_in.full_name
+    
+    if profile_in.email is not None:
+        # بررسی تکراری نبودن ایمیل (به جز خود ادمین)
+        existing = admin_crud.get_by_email(db, profile_in.email)
+        if existing and existing.id != admin.id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Email already registered",
+            )
+        admin.email = profile_in.email
+
+    db.add(admin)
+    db.commit()
+    db.refresh(admin)
+
+    # ✅ بازگرداندن اطلاعات به‌روز شده
     return admin

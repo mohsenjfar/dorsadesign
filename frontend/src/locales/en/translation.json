@@ -77,8 +77,10 @@
       "title": "Contact Information",
       "email": "Email",
       "phone": "Phone",
+      "phone_number": "+98",
+      "phone_number_ref": "+98",
       "address": "Address",
-      "address_text": "Tehran, Valiasr St..."
+      "address_text": "Bastak"
     },
     "success": "Your message has been sent successfully!",
     "error": "Error sending message. Please try again.",
@@ -112,7 +114,29 @@
       "welcome": "Welcome back,",
       "add_project": "Add Project",
       "projects_list": "List of projects will be displayed here.",
-      "total_projects": "Total Projects"
+      "total_projects": "Total Projects",
+      "profile": "My Profile"
+    },
+    "profile": {
+      "title": "My Profile",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "basic_info": "Basic Information",
+      "username": "Username",
+      "username_readonly": "Username cannot be changed",
+      "full_name": "Full Name",
+      "full_name_placeholder": "Enter your full name",
+      "email": "Email",
+      "email_placeholder": "Enter your email",
+      "change_password": "Change Password",
+      "password_hint": "Leave blank if you don't want to change your password",
+      "current_password": "Current Password",
+      "current_password_placeholder": "Enter current password",
+      "new_password": "New Password",
+      "new_password_placeholder": "Enter new password (min 6 chars)",
+      "confirm_password": "Confirm New Password",
+      "confirm_password_placeholder": "Confirm new password"
     },
     "project": {
       "create_title": "Add New Project",
@@ -151,7 +175,9 @@
       "click_to_upload_cover": "Click to upload cover image",
       "click_to_upload_gallery": "Click to upload gallery images",
       "choose_cover": "Choose Cover",
-      "choose_gallery": "Choose Gallery"
+      "choose_gallery": "Choose Gallery",
+      "edit_title": "Edit Project",
+      "update": "Update Project"
     }
   }
 }

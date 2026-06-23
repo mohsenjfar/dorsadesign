@@ -77,8 +77,10 @@
       "title": "اطلاعات تماس",
       "email": "ایمیل",
       "phone": "تلفن",
+      "phone_number": "+98",
+      "phone_number_ref": "+98",
       "address": "آدرس",
-      "address_text": "تهران، خیابان ولیعصر..."
+      "address_text": "بستک"
     },
     "success": "پیام شما با موفقیت ارسال شد!",
     "error": "خطا در ارسال پیام. لطفاً دوباره تلاش کنید.",
@@ -112,7 +114,29 @@
       "welcome": "خوش آمدید،",
       "add_project": "افزودن پروژه",
       "projects_list": "لیست پروژه‌ها در اینجا نمایش داده می‌شود.",
-      "total_projects": "تعداد کل پروژه‌ها"
+      "total_projects": "تعداد کل پروژه‌ها",
+      "profile": "پروفایل من"
+    },
+    "profile": {
+      "title": "پروفایل من",
+      "cancel": "انصراف",
+      "save": "ذخیره تغییرات",
+      "saving": "در حال ذخیره...",
+      "basic_info": "اطلاعات پایه",
+      "username": "نام کاربری",
+      "username_readonly": "نام کاربری قابل تغییر نیست",
+      "full_name": "نام کامل",
+      "full_name_placeholder": "نام کامل خود را وارد کنید",
+      "email": "ایمیل",
+      "email_placeholder": "ایمیل خود را وارد کنید",
+      "change_password": "تغییر رمز عبور",
+      "password_hint": "در صورت تمایل به تغییر رمز عبور، فیلدهای زیر را پر کنید",
+      "current_password": "رمز عبور فعلی",
+      "current_password_placeholder": "رمز عبور فعلی را وارد کنید",
+      "new_password": "رمز عبور جدید",
+      "new_password_placeholder": "رمز عبور جدید را وارد کنید (حداقل ۶ کاراکتر)",
+      "confirm_password": "تکرار رمز عبور جدید",
+      "confirm_password_placeholder": "رمز عبور جدید را مجدداً وارد کنید"
     },
     "project": {
       "create_title": "افزودن پروژه جدید",
@@ -151,7 +175,9 @@
       "click_to_upload_cover": "برای آپلود تصویر کاور کلیک کنید",
       "click_to_upload_gallery": "برای آپلود تصاویر گالری کلیک کنید",
       "choose_cover": "انتخاب کاور",
-      "choose_gallery": "انتخاب گالری"
+      "choose_gallery": "انتخاب گالری",
+      "edit_title": "ویرایش پروژه",
+      "update": "به‌روزرسانی پروژه"
     }
   }
 }

@@ -1,8 +1,9 @@
 # backend/app/api/admin/projects.py
-from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
+from fastapi import APIRouter, Depends, status, File, UploadFile
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List
 from uuid import UUID
+import uuid
 from app.database import get_db
 from app.crud import project_crud
 from app.core.security import get_current_admin
@@ -12,7 +13,6 @@ from app.schemas.project import (
     ProjectUpdate,
     ProjectResponse,
 )
-from app.models.project import Project, ProjectStatus
 from app.utils.file_upload import save_upload_file, delete_file, ensure_upload_dirs
 import logging
 
@@ -24,6 +24,54 @@ router = APIRouter()
 # ============================================
 # Admin Project Management Endpoints
 # ============================================
+
+# ============================================
+# Helper Functions
+# ============================================
+
+def get_translation(data: dict, language: str) -> str:
+    """
+    دریافت مقدار ترجمه‌شده از یک دیکشنری JSON
+    
+    Args:
+        data: دیکشنری حاوی ترجمه‌ها (مثلاً {'en': '...', 'fa': '...'})
+        language: زبان مورد نظر (en/fa)
+    
+    Returns:
+        مقدار ترجمه‌شده یا رشته خالی
+    """
+    if not isinstance(data, dict):
+        return str(data) if data else ""
+    return data.get(language, data.get('en', ''))
+
+
+def get_translated_list(data: dict, language: str) -> list:
+    """
+    دریافت لیست ترجمه‌شده از یک دیکشنری JSON
+    
+    Args:
+        data: دیکشنری حاوی لیست ترجمه‌ها (مثلاً {'en': [...], 'fa': [...]})
+        language: زبان مورد نظر (en/fa)
+    
+    Returns:
+        لیست ترجمه‌شده یا لیست خالی
+    """
+    if not isinstance(data, dict):
+        return []
+    return data.get(language, data.get('en', []))
+
+@router.get("/by-id/{project_id}", response_model=ProjectResponse)
+async def get_project_by_id_admin(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    current_admin: dict = Depends(get_current_admin),
+):
+    """دریافت کامل پروژه با ID (بدون ترجمه) - شامل هر دو زبان"""
+    project = project_crud.get(db, project_id)
+    if not project:
+        raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
+
+    return ProjectResponse.model_validate(project)
 
 @router.post("/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
 async def create_project(

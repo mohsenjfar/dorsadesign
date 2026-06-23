@@ -1,5 +1,5 @@
 # backend/app/api/projects.py
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 from uuid import UUID
@@ -8,14 +8,10 @@ from app.crud import project_crud
 from app.schemas.project import (
     ProjectResponse,
     ProjectListResponse,
-    ProjectList,
-    ProjectCreate,
-    ProjectUpdate,
+    ProjectList
 )
 from app.models.project import ProjectType, ProjectStatus
-from app.core.exceptions import NotFoundException, ConflictException
-from app.core.security import get_current_admin
-from app.utils.file_upload import delete_file
+from app.core.exceptions import NotFoundException
 import logging
 
 logger = logging.getLogger(__name__)
@@ -62,8 +58,6 @@ def get_translated_list(data: dict, language: str) -> list:
 # ============================================
 # Public Endpoints
 # ============================================
-
-# backend/app/api/projects.py
 
 @router.get("/", response_model=ProjectList)
 async def get_projects(
@@ -122,8 +116,6 @@ async def get_projects(
         pages=pages,
     )
 
-# backend/app/api/projects.py
-
 @router.get("/featured", response_model=list[ProjectListResponse])
 async def get_featured_projects(
     db: Session = Depends(get_db),
@@ -161,22 +153,12 @@ async def get_project_by_slug(
     db: Session = Depends(get_db),
     language: str = Query('en', description="Language (en/fa)"),
 ):
-    """
-    دریافت جزئیات کامل یک پروژه با slug
-    
-    هنگام بازدید، تعداد بازدید (views) یک واحد افزایش می‌یابد.
-    """
     project = project_crud.get_by_slug(db, slug=slug)
-
     if not project:
         raise NotFoundException(detail=f"Project with slug '{slug}' not found")
 
-    # فقط پروژه‌های منتشر شده قابل مشاهده هستند
-    if project.status != ProjectStatus.PUBLISHED:
-        raise NotFoundException(detail="Project not found")
-
-    # ✅ ساخت دیکشنری با مقادیر ترجمه‌شده
-    project_dict = {
+    # ✅ استخراج ترجمه و ساخت پاسخ
+    response_dict = {
         "id": project.id,
         "title": get_translation(project.title, language),
         "slug": project.slug,
@@ -196,122 +178,9 @@ async def get_project_by_slug(
         "updated_at": project.updated_at,
     }
     
-    # ✅ اعتبارسنجی با Pydantic بعد از ترجمه
-    response = ProjectResponse.model_validate(project_dict)
+    response = ProjectResponse.model_validate(response_dict)
 
     # افزایش تعداد بازدید
     project = project_crud.increment_views(db, project=project)
 
     return response
-
-
-# ============================================
-# Admin Endpoints (با احراز هویت)
-# ============================================
-
-@router.post(
-    "/",
-    response_model=ProjectResponse,
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_project(
-    project_in: ProjectCreate,
-    db: Session = Depends(get_db),
-    current_admin: dict = Depends(get_current_admin),
-):
-    """
-    ایجاد پروژه جدید (فقط ادمین)
-    """
-    # بررسی تکراری نبودن slug
-    existing = project_crud.get_by_slug(db, project_in.slug)
-    if existing:
-        raise ConflictException(
-            detail=f"Project with slug '{project_in.slug}' already exists"
-        )
-
-    project = project_crud.create(db, obj_in=project_in)
-    logger.info(f"Project created by admin {current_admin['username']}: {project_in.title.get('en', '')}")
-
-    # ✅ ساخت response_dict با تبدیل features به لیست
-    response_dict = {
-        "id": project.id,
-        "title": project.title.get('en', '') if isinstance(project.title, dict) else str(project.title),
-        "slug": project.slug,
-        "description": project.description.get('en', '') if isinstance(project.description, dict) else project.description,
-        "full_description": project.full_description.get('en', '') if isinstance(project.full_description, dict) else project.full_description,
-        "features": project.features.get('en', []) if isinstance(project.features, dict) else (project.features if isinstance(project.features, list) else []),
-        "project_type": project.project_type,
-        "client_name": project.client_name,
-        "year": project.year,
-        "area": project.area,
-        "status": project.status,
-        "cover_image": project.cover_image,
-        "gallery_images": project.gallery_images,
-        "is_featured": project.is_featured,
-        "views": project.views,
-        "created_at": project.created_at,
-        "updated_at": project.updated_at,
-    }
-    
-    return ProjectResponse.model_validate(response_dict)
-
-@router.put(
-    "/{project_id}",
-    response_model=ProjectResponse,
-)
-async def update_project(
-    project_id: UUID,
-    project_in: ProjectUpdate,
-    db: Session = Depends(get_db),
-    current_admin: dict = Depends(get_current_admin),
-):
-    """
-    ویرایش پروژه (فقط ادمین)
-    """
-    project = project_crud.get(db, project_id)
-    if not project:
-        raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
-
-    # بررسی slug تکراری (اگر تغییر کرده باشد)
-    if project_in.slug and project_in.slug != project.slug:
-        existing = project_crud.get_by_slug(db, project_in.slug)
-        if existing:
-            raise ConflictException(
-                detail=f"Project with slug '{project_in.slug}' already exists"
-            )
-
-    project = project_crud.update(db, db_obj=project, obj_in=project_in)
-    logger.info(f"Project updated by admin {current_admin['username']}: {project.id}")
-
-    return ProjectResponse.model_validate(project)
-
-
-@router.delete(
-    "/{project_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
-async def delete_project(
-    project_id: UUID,
-    db: Session = Depends(get_db),
-    current_admin: dict = Depends(get_current_admin),
-):
-    """
-    حذف پروژه و تصاویر مرتبط (فقط ادمین)
-    """
-    project = project_crud.get(db, project_id)
-    if not project:
-        raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
-
-    # حذف تصاویر مرتبط
-    if project.cover_image:
-        delete_file(project.cover_image)
-    if project.gallery_images:
-        for img in project.gallery_images.split(","):
-            if img.strip():
-                delete_file(img.strip())
-
-    # حذف پروژه از دیتابیس
-    project_crud.delete(db, project_id=project_id)
-    logger.info(f"Project deleted by admin {current_admin['username']}: {project.id}")
-
-    return None

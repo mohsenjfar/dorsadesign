@@ -69,6 +69,8 @@ class ProjectUpdate(BaseModel):
 # Response Schemas (با پشتیبانی از زبان)
 # ============================================
 
+# backend/app/schemas/project.py
+
 class ProjectResponse(BaseModel):
     """Schema for project response with language support"""
     id: UUID
@@ -93,26 +95,12 @@ class ProjectResponse(BaseModel):
         from_attributes = True
 
     # ============================================
-    # ✅ Validator برای تبدیل خودکار JSON به رشته
+    # ✅ Validator: داده‌های JSON را به همان شکل نگه می‌دارد
     # ============================================
     @model_validator(mode='before')
     @classmethod
     def validate_translations(cls, data: Any) -> Any:
-        """Convert JSON fields to strings if they are dicts"""
-        if isinstance(data, dict):
-            # اگر title دیکشنری است، مقدار 'en' را استخراج کن
-            if 'title' in data and isinstance(data['title'], dict):
-                data['title'] = data['title'].get('en', '')
-            
-            if 'description' in data and isinstance(data['description'], dict):
-                data['description'] = data['description'].get('en', '')
-            
-            if 'full_description' in data and isinstance(data['full_description'], dict):
-                data['full_description'] = data['full_description'].get('en', '')
-            
-            if 'features' in data and isinstance(data['features'], dict):
-                data['features'] = data['features'].get('en', [])
-        
+        """Keep JSON data as-is, don't modify"""
         return data
 
 

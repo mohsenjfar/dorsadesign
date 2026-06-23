@@ -36,7 +36,7 @@ const Contact = () => {
 
   const contactInfo = [
     { icon: FiMail, label: t('contact.info.email'), value: 'info@dorsadesign.ir', href: 'mailto:info@dorsadesign.ir' },
-    { icon: FiPhone, label: t('contact.info.phone'), value: '+۹۸ ۲۱ ۱۲۳۴ ۵۶۷۸', href: 'tel:+982112345678' },
+    { icon: FiPhone, label: t('contact.info.phone'), value: t('contact.info.phone_number'), href: t('contact.info.phone_number_ref') },
     { icon: FiMapPin, label: t('contact.info.address'), value: t('contact.info.address_text') },
   ]
 

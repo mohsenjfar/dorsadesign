@@ -11,7 +11,8 @@ import {
   FiEye,
   FiEyeOff,
   FiArchive,
-  FiCheckCircle
+  FiCheckCircle,
+  FiUser
 } from 'react-icons/fi'
 import api from '../../services/api'
 
@@ -108,6 +109,15 @@ const Dashboard = () => {
             <FiLogOut className="w-5 h-5" />
             {t('admin.dashboard.logout')}
           </button>
+          
+          <Link
+            to="/admin/profile"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all duration-300"
+          >
+            <FiUser className="w-5 h-5" />
+            {t('admin.dashboard.profile')}
+          </Link>
+
         </div>
       </div>
 
@@ -201,12 +211,14 @@ const Dashboard = () => {
                           >
                             <FiEye className="w-4 h-4" />
                           </Link>
-                          <button
+
+                          <Link
+                            to={`/admin/projects/edit/${project.id}`}
                             className="p-2 text-gray-400 hover:text-blue-600 transition"
                             title="ویرایش"
                           >
                             <FiEdit className="w-4 h-4" />
-                          </button>
+                          </Link>
                           <button
                             onClick={() => handleDelete(project.id, project.title)}
                             className="p-2 text-gray-400 hover:text-red-600 transition"

@@ -31,6 +31,13 @@ class AdminRegister(BaseModel):
     full_name: Optional[str] = Field(None, max_length=255)
 
 
+class AdminUpdate(BaseModel):
+    """Schema for updating admin profile"""
+    full_name: Optional[str] = Field(None, max_length=255)
+    email: Optional[EmailStr] = None
+    current_password: Optional[str] = Field(None, min_length=6)
+    new_password: Optional[str] = Field(None, min_length=6)
+    
 # ============================================
 # Token Schemas
 # ============================================
@@ -71,11 +78,3 @@ class AdminResponse(BaseModel):
     
     class Config:
         from_attributes = True
-
-
-class AdminUpdate(BaseModel):
-    """Admin update request schema"""
-    email: Optional[EmailStr] = None
-    full_name: Optional[str] = Field(None, max_length=255)
-    password: Optional[str] = Field(None, min_length=6)
-    is_active: Optional[bool] = None
