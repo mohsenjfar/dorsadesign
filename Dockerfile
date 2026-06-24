@@ -7,13 +7,20 @@ FROM python:3.11-slim AS backend
 WORKDIR /app
 
 # ============================================
+# تنظیم رجیستری از متغیر محیطی
+# ============================================
+ARG PIP_INDEX_URL
+ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
+
+# ============================================
 # کپی و نصب وابستگی‌های بک‌اند
 # ============================================
-# ✅ کپی کل پوشه requirements
 COPY backend/requirements/ ./backend/requirements/
 
-# نصب وابستگی‌های تولید (prod)
-RUN pip install --no-cache-dir -r backend/requirements/prod.txt
+# نصب وابستگی‌های تولید (prod) با رجیستری مشخص
+RUN pip install --no-cache-dir \
+    --index-url ${PIP_INDEX_URL} \
+    -r backend/requirements/prod.txt
 
 # ============================================
 # کپی کد بک‌اند
@@ -45,6 +52,12 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # ============================================
+# تنظیم رجیستری از متغیر محیطی
+# ============================================
+ARG PIP_INDEX_URL
+ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
+
+# ============================================
 # کپی بک‌اند از مرحله اول
 # ============================================
 COPY --from=backend /app/backend ./backend/
@@ -55,7 +68,9 @@ COPY --from=backend /app/alembic ./alembic/
 # کپی و نصب وابستگی‌ها (دوباره برای ایمیج نهایی)
 # ============================================
 COPY backend/requirements/ ./backend/requirements/
-RUN pip install --no-cache-dir -r backend/requirements/prod.txt
+RUN pip install --no-cache-dir \
+    --index-url ${PIP_INDEX_URL} \
+    -r backend/requirements/prod.txt
 
 # ============================================
 # کپی فرانت‌اند (Build شده) از مرحله دوم

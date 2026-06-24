@@ -35,6 +35,7 @@ jobs:
       LOG_LEVEL: ${{ vars.LOG_LEVEL || 'INFO' }}
       LOG_FILE: ${{ vars.LOG_FILE || './logs/app.log' }}
       FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+      PIP_INDEX_URL: ${{ vars.PIP_INDEX_URL || 'https://pypi.org/simple' }}
 
     steps:
       - name: 1️⃣ Checkout Source
@@ -57,7 +58,9 @@ jobs:
         run: |
           set -e
           cd repo
-          docker build -t dorsadesign:$IMAGE_TAG .
+          docker build \
+            --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
+            -t dorsadesign:$IMAGE_TAG .
 
       - name: 4️⃣ Start Application Container
         shell: bash
@@ -66,16 +69,16 @@ jobs:
           cd repo
           docker compose up -d app
 
-      - name: 5️⃣ Cleanup Workspace
-        shell: bash
-        run: |
-          set -e
-          cd repo
-          git clean -fdx || true
-
-      - name: 6️⃣ Health Check
+      - name: 5️⃣ Health Check
         shell: bash
         run: |
           echo "🏥 Checking service health..."
           sleep 10
           curl -f http://localhost:80/health || echo "⚠️ Health check failed"
+
+      - name: 6️⃣ Cleanup Workspace
+        shell: bash
+        run: |
+          set -e
+          cd repo
+          git clean -fdx || true
