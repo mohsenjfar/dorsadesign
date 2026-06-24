@@ -7,7 +7,7 @@ FROM python:3.11-slim AS backend
 WORKDIR /app
 
 # ============================================
-# تنظیم رجیستری از متغیر محیطی
+# تنظیم رجیستری pip از متغیر محیطی
 # ============================================
 ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
@@ -34,11 +34,20 @@ COPY backend/alembic.ini ./alembic.ini
 COPY backend/alembic/ ./alembic/
 
 # ============================================
-# مرحله ۲: ساخت فرانت‌اند (Node.js)
+# مرحله ۲: ساخت فرانت‌اند (Node.js) با رجیستری قابل تنظیم
 # ============================================
 FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
+
+# ============================================
+# ✅ تنظیم رجیستری npm از متغیر محیطی
+# ============================================
+ARG NPM_REGISTRY
+ENV NPM_REGISTRY=${NPM_REGISTRY:-https://registry.npmjs.org}
+
+# تنظیم رجیستری npm
+RUN npm config set registry ${NPM_REGISTRY}
 
 # کپی package.json و نصب وابستگی‌ها
 COPY frontend/package*.json ./
@@ -56,7 +65,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # ============================================
-# تنظیم رجیستری از متغیر محیطی
+# تنظیم رجیستری pip از متغیر محیطی
 # ============================================
 ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
