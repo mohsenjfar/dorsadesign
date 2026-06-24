@@ -3,24 +3,17 @@ set -e
 
 echo "🚀 Starting dorsadesign..."
 
-cd /app
+cd /app/backend  # ✅ رفتن به پوشه backend
 
-# ============================================
-# 📦 اجرای مهاجرت‌های دیتابیس
-# ============================================
+export PYTHONPATH=/app/backend:$PYTHONPATH
+
 echo "📦 Running database migrations..."
-python -m alembic upgrade head
+python -m alembic upgrade head || {
+    echo "⚠️ Migration failed, but continuing..."
+}
 
-# ============================================
-# 👤 ایجاد ادمین (در صورت عدم وجود)
-# ============================================
-echo "👤 Creating admin user (if not exists)..."
-cd /app/backend
+echo "👤 Creating admin user..."
 python seed_admin.py || echo "⚠️ Admin already exists or creation failed"
 
-# ============================================
-# 🐍 اجرای FastAPI
-# ============================================
 echo "🐍 Starting FastAPI backend..."
-cd /app
-exec python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+exec python -m app.main  # ✅ اجرای app.main از داخل backend

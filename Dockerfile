@@ -10,7 +10,7 @@ ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
 
 # ============================================
-# ✅ لایه ۱: فقط وابستگی‌ها (تغییر نمی‌کنند مگر با تغییر requirements)
+# ✅ لایه ۱: فقط وابستگی‌ها
 # ============================================
 COPY backend/requirements/ ./backend/requirements/
 RUN pip install --no-cache-dir \
@@ -18,11 +18,9 @@ RUN pip install --no-cache-dir \
     -r backend/requirements/prod.txt
 
 # ============================================
-# ✅ لایه ۲: کد (تغییر می‌کند)
+# ✅ لایه ۲: کد بک‌اند (کل پوشه backend کپی میشه)
 # ============================================
 COPY backend/ ./backend/
-COPY backend/alembic.ini ./alembic.ini
-COPY backend/alembic/ ./alembic/
 
 # ============================================
 # مرحله ۲: ساخت فرانت‌اند (Node.js)
@@ -34,16 +32,10 @@ WORKDIR /app
 ARG NPM_REGISTRY
 ENV NPM_REGISTRY=${NPM_REGISTRY:-https://registry.npmjs.org}
 
-# ============================================
-# ✅ لایه ۱: فقط package.json (تغییر نمی‌کند مگر با تغییر وابستگی‌ها)
-# ============================================
 COPY frontend/package*.json ./
 RUN npm config set registry ${NPM_REGISTRY} \
     && npm ci --legacy-peer-deps
 
-# ============================================
-# ✅ لایه ۲: کد (تغییر می‌کند)
-# ============================================
 COPY frontend/ ./
 RUN npm run build
 
@@ -58,20 +50,18 @@ ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
 
 # ============================================
-# ✅ لایه ۱: وابستگی‌ها (از مرحله backend کپی می‌شوند)
+# ✅ لایه ۱: وابستگی‌ها از مرحله backend
 # ============================================
 COPY --from=backend /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=backend /usr/local/bin /usr/local/bin
 
 # ============================================
-# ✅ لایه ۲: کد بک‌اند
+# ✅ لایه ۲: کل پوشه backend (با همه محتویاتش)
 # ============================================
 COPY --from=backend /app/backend ./backend/
-COPY --from=backend /app/alembic.ini ./
-COPY --from=backend /app/alembic ./alembic/
 
 # ============================================
-# ✅ لایه ۳: کد فرانت‌اند (Build شده)
+# ✅ لایه ۳: فرانت‌اند (Build شده)
 # ============================================
 COPY --from=frontend-builder /app/dist ./frontend/dist
 
@@ -85,7 +75,10 @@ RUN mkdir -p /app/uploads/projects/covers \
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-ENV PYTHONPATH=/app
+# ============================================
+# ✅ تنظیم PYTHONPATH برای کار با backend
+# ============================================
+ENV PYTHONPATH=/app/backend
 ENV UPLOAD_DIR=/app/uploads
 ENV LOG_FILE=/app/logs/app.log
 
