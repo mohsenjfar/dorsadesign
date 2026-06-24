@@ -30,6 +30,9 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 
 ARG NPM_REGISTRY
+ARG VITE_API_URL
+
+ENV VITE_API_URL=${VITE_API_URL:-https://dorsadesign.ir}
 ENV NPM_REGISTRY=${NPM_REGISTRY:-https://registry.npmjs.org}
 
 # ============================================

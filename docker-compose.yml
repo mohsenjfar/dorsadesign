@@ -45,7 +45,7 @@ services:
       - ALLOWED_EXTENSIONS
       - LOG_LEVEL
       - LOG_FILE
-      - FRONTEND_URL
+      - VITE_API_URL
     depends_on:
       postgres:
         condition: service_healthy
