@@ -68,8 +68,8 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" onClick={goToHome} className="flex items-center space-x-2 rtl:space-x-reverse">
-            <span className="text-2xl font-display font-bold text-primary-700 dark:text-primary-400">DORSA</span>
-            <span className="text-2xl font-display font-light text-gray-600 dark:text-gray-400">DESIGN</span>
+            <span className="text-2xl font-display font-bold text-primary-700 dark:text-primary-400">dorsa</span>
+            <span className="text-2xl font-display font-light text-gray-600 dark:text-gray-400">design</span>
           </Link>
 
           {/* Desktop Navigation */}

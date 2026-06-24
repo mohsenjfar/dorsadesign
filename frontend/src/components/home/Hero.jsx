@@ -72,8 +72,8 @@ const Hero = () => {
           className="space-y-4"
         >
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight">
-            <span className="text-primary-400">DORSA</span>
-            <span className="text-white">DESIGN</span>
+            <span className="text-primary-400">dorsa</span>
+            <span className="text-white">design</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-white/80 font-light max-w-2xl mx-auto">
             {t('hero.subtitle')}  {/* ✅ تغییر */}
