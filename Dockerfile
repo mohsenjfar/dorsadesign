@@ -74,9 +74,7 @@ COPY --from=frontend-builder /app/dist ./frontend/dist
 # ============================================
 # ✅ ایجاد پوشه‌های مورد نیاز (بر اساس ساختار پروژه)
 # ============================================
-RUN mkdir -p /app/uploads/projects/covers \
-    /app/uploads/projects/galleries \
-    /app/logs
+RUN mkdir -p /app/uploads /app/logs
 
 # ============================================
 # ✅ کپی اسکریپت ورودی

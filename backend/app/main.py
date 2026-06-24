@@ -1,18 +1,19 @@
 # backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+import logging
+import os
+
 from app.config import settings
 from app.database import test_connection
 from app.api import api_router
-import logging
-from fastapi.staticfiles import StaticFiles
-from app.core.rate_limit import limiter, rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,9 +31,8 @@ async def lifespan(app: FastAPI):
 
 
 # ============================================
-# ✅ Create FastAPI application with correct docs
+# ✅ Create FastAPI application
 # ============================================
-
 app = FastAPI(
     title="dorsadesign.ir API",
     description="""
@@ -61,9 +61,20 @@ This API provides access to architecture projects and content management.
     lifespan=lifespan,
 )
 
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+# ============================================
+# ✅ Static Files
+# ============================================
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
+# ============================================
+# ✅ Middleware (ترتیب مهم است)
+# ============================================
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=settings.ALLOWED_HOSTS
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -73,23 +84,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# CORS middleware
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=settings.ALLOWED_HOSTS
-)
-
 # ============================================
 # ✅ Include API router
 # ============================================
-
 app.include_router(api_router, prefix="/api")
 
 
 # ============================================
-# Health Check Endpoints
+# ✅ Health Check Endpoints
 # ============================================
-
 @app.get("/")
 async def root():
     return {
@@ -105,14 +108,12 @@ async def root():
 async def health_check():
     if test_connection():
         return {"status": "healthy", "database": "connected"}
-    else:
-        return {"status": "unhealthy", "database": "disconnected"}
+    return {"status": "unhealthy", "database": "disconnected"}
 
 
 # ============================================
-# Run
+# ✅ Run
 # ============================================
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
