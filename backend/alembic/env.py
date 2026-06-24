@@ -11,7 +11,10 @@ from dotenv import load_dotenv
 # اضافه کردن مسیر app به sys.path
 # ============================================
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+sys.path.insert(0, project_root)
+sys.path.insert(0, os.path.join(project_root, "app"))
 
 # ============================================
 # بارگذاری متغیرهای محیطی از .env
@@ -24,7 +27,7 @@ load_dotenv()
 # ============================================
 
 from app.database import Base
-from app.models import Project #, Admin  # بعداً ایجاد می‌شوند
+from app.models import Project, Admin  # بعداً ایجاد می‌شوند
 
 # ============================================
 # تنظیمات Alembic
