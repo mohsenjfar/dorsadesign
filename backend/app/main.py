@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import logging
 import os
@@ -17,59 +18,60 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage application startup and shutdown events"""
     logger.info("🚀 Starting dorsadesign.ir API...")
-    
     if test_connection():
         logger.info("✅ Connected to PostgreSQL")
     else:
         logger.error("❌ Failed to connect to PostgreSQL!")
-    
     yield
-    
     logger.info("🛑 Shutting down dorsadesign.ir API...")
 
 
-# ============================================
-# ✅ Create FastAPI application
-# ============================================
 app = FastAPI(
     title="dorsadesign.ir API",
-    description="""
-🏛️ **dorsadesign.ir Architecture Portfolio API**
-
-This API provides access to architecture projects and content management.
-
-## Features:
-* 📋 List projects with filtering and pagination
-* 🔍 Get project details by slug
-* 🔐 Admin authentication (JWT)
-* 📝 Project management (CRUD)
-
-## Documentation:
-* **Swagger UI**: `/api/docs` - Interactive API testing
-* **ReDoc**: `/api/redoc` - Beautiful documentation
-""",
+    description="🏛️ Architecture Portfolio API",
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
-    contact={
-        "name": "dorsadesign",
-        "url": "https://dorsadesign.ir",
-    },
     lifespan=lifespan,
 )
 
 # ============================================
-# ✅ Static Files
+# ✅ مسیرهای API و آپلود
 # ============================================
+app.include_router(api_router, prefix="/api")
+
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # ============================================
-# ✅ Middleware (ترتیب مهم است)
+# ✅ سرو فایل‌های استاتیک فرانت‌اند
+# ============================================
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")
+FRONTEND_DIR = os.path.abspath(FRONTEND_DIR)
+
+if os.path.exists(FRONTEND_DIR):
+    # سرو فایل‌های assets (css, js, images)
+    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """سرو صفحات فرانت‌اند (SPA)"""
+        file_path = os.path.join(FRONTEND_DIR, full_path)
+        
+        # اگر فایل وجود داشت، برگردون
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        
+        # در غیر این صورت، index.html رو برگردون (برای SPA)
+        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+else:
+    logger.warning(f"⚠️ Frontend build not found at: {FRONTEND_DIR}")
+
+# ============================================
+# ✅ Middleware
 # ============================================
 app.add_middleware(
     TrustedHostMiddleware,
@@ -84,14 +86,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ============================================
-# ✅ Include API router
-# ============================================
-app.include_router(api_router, prefix="/api")
-
 
 # ============================================
-# ✅ Health Check Endpoints
+# ✅ Health Check
 # ============================================
 @app.get("/")
 async def root():
@@ -111,9 +108,6 @@ async def health_check():
     return {"status": "unhealthy", "database": "disconnected"}
 
 
-# ============================================
-# ✅ Run
-# ============================================
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
