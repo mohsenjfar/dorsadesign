@@ -237,46 +237,6 @@ async def get_current_admin_info(
     
     return admin
 
-
-# ============================================
-# Create First Admin (Seed) - For Development Only
-# ============================================
-
-@router.post("/seed", response_model=AdminResponse)
-async def create_first_admin(
-    admin_data: AdminCreate,
-    db: Session = Depends(get_db),
-):
-    """
-    Create the first admin user (for development only)
-    """
-    # Check if any admin exists
-    first_admin = db.query(Admin).first()
-    if first_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin already exists. Use admin creation via admin panel.",
-        )
-    
-    # Check if username exists
-    if admin_crud.get_by_username(db, admin_data.username):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Username already taken",
-        )
-    
-    # Check if email exists
-    if admin_crud.get_by_email(db, admin_data.email):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered",
-        )
-    
-    # Create admin
-    admin = admin_crud.create(db, obj_in=admin_data)
-    
-    return admin
-
 @router.put("/profile", response_model=AdminResponse)
 async def update_admin_profile(
     profile_in: AdminUpdate,
