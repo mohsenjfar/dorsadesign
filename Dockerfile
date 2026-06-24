@@ -10,7 +10,7 @@ ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
 
 # ============================================
-# ✅ لایه ۱: فقط وابستگی‌ها
+# ✅ لایه ۱: فقط وابستگی‌ها (تغییر نمی‌کنند مگر با تغییر requirements)
 # ============================================
 COPY backend/requirements/ ./backend/requirements/
 RUN pip install --no-cache-dir \
@@ -32,10 +32,16 @@ WORKDIR /app
 ARG NPM_REGISTRY
 ENV NPM_REGISTRY=${NPM_REGISTRY:-https://registry.npmjs.org}
 
+# ============================================
+# ✅ لایه ۱: فقط package.json (تغییر نمی‌کند مگر با تغییر وابستگی‌ها)
+# ============================================
 COPY frontend/package*.json ./
 RUN npm config set registry ${NPM_REGISTRY} \
     && npm ci --legacy-peer-deps
 
+# ============================================
+# ✅ لایه ۲: کد فرانت‌اند
+# ============================================
 COPY frontend/ ./
 RUN npm run build
 
@@ -66,22 +72,31 @@ COPY --from=backend /app/backend ./backend/
 COPY --from=frontend-builder /app/dist ./frontend/dist
 
 # ============================================
-# ایجاد پوشه‌های مورد نیاز
+# ✅ ایجاد پوشه‌های مورد نیاز
 # ============================================
 RUN mkdir -p /app/uploads/projects/covers \
     /app/uploads/projects/galleries \
     /app/logs
 
+# ============================================
+# ✅ کپی اسکریپت ورودی
+# ============================================
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # ============================================
-# ✅ تنظیم PYTHONPATH برای کار با backend
+# ✅ تنظیم متغیرهای محیطی
 # ============================================
 ENV PYTHONPATH=/app/backend
 ENV UPLOAD_DIR=/app/uploads
 ENV LOG_FILE=/app/logs/app.log
 
+# ============================================
+# ✅ پورت
+# ============================================
 EXPOSE 8000
 
+# ============================================
+# ✅ نقطه ورود
+# ============================================
 ENTRYPOINT ["/docker-entrypoint.sh"]
