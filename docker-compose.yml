@@ -46,6 +46,7 @@ services:
       - LOG_LEVEL
       - LOG_FILE
       - FRONTEND_URL
+      - PYTHONPATH=/app
     depends_on:
       postgres:
         condition: service_healthy
