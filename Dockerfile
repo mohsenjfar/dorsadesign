@@ -10,7 +10,7 @@ ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
 
 # ============================================
-# ✅ لایه ۱: فقط وابستگی‌ها (تغییر نمی‌کنند مگر با تغییر requirements)
+# ✅ لایه ۱: وابستگی‌ها
 # ============================================
 COPY backend/requirements/ ./backend/requirements/
 RUN pip install --no-cache-dir \
@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir \
     -r backend/requirements/prod.txt
 
 # ============================================
-# ✅ لایه ۲: کد بک‌اند (کل پوشه backend کپی میشه)
+# ✅ لایه ۲: کد بک‌اند
 # ============================================
 COPY backend/ ./backend/
 
@@ -33,7 +33,7 @@ ARG NPM_REGISTRY
 ENV NPM_REGISTRY=${NPM_REGISTRY:-https://registry.npmjs.org}
 
 # ============================================
-# ✅ لایه ۱: فقط package.json (تغییر نمی‌کند مگر با تغییر وابستگی‌ها)
+# ✅ لایه ۱: وابستگی‌های npm
 # ============================================
 COPY frontend/package*.json ./
 RUN npm config set registry ${NPM_REGISTRY} \
@@ -56,13 +56,13 @@ ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
 
 # ============================================
-# ✅ لایه ۱: وابستگی‌ها از مرحله backend
+# ✅ لایه ۱: وابستگی‌ها (از مرحله backend)
 # ============================================
 COPY --from=backend /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=backend /usr/local/bin /usr/local/bin
 
 # ============================================
-# ✅ لایه ۲: کل پوشه backend (با همه محتویاتش)
+# ✅ لایه ۲: کد بک‌اند (کل پوشه)
 # ============================================
 COPY --from=backend /app/backend ./backend/
 
@@ -72,7 +72,7 @@ COPY --from=backend /app/backend ./backend/
 COPY --from=frontend-builder /app/dist ./frontend/dist
 
 # ============================================
-# ✅ ایجاد پوشه‌های مورد نیاز
+# ✅ ایجاد پوشه‌های مورد نیاز (بر اساس ساختار پروژه)
 # ============================================
 RUN mkdir -p /app/uploads/projects/covers \
     /app/uploads/projects/galleries \
@@ -91,12 +91,6 @@ ENV PYTHONPATH=/app/backend
 ENV UPLOAD_DIR=/app/uploads
 ENV LOG_FILE=/app/logs/app.log
 
-# ============================================
-# ✅ پورت
-# ============================================
 EXPOSE 8000
 
-# ============================================
-# ✅ نقطه ورود
-# ============================================
 ENTRYPOINT ["/docker-entrypoint.sh"]

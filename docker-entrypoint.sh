@@ -2,18 +2,33 @@
 set -e
 
 echo "🚀 Starting dorsadesign..."
+echo "📂 Working directory: $(pwd)"
+echo "🐍 Python version: $(python --version)"
 
-cd /app/backend  # ✅ رفتن به پوشه backend
+cd /app/backend
 
+# ============================================
+# ✅ تنظیم PYTHONPATH
+# ============================================
 export PYTHONPATH=/app/backend:$PYTHONPATH
 
+# ============================================
+# 📦 اجرای مهاجرت‌های دیتابیس
+# ============================================
 echo "📦 Running database migrations..."
 python -m alembic upgrade head || {
     echo "⚠️ Migration failed, but continuing..."
 }
 
-echo "👤 Creating admin user..."
+# ============================================
+# 👤 ایجاد ادمین (با متغیرهای محیطی)
+# ============================================
+echo "👤 Creating admin user (if not exists)..."
 python seed_admin.py || echo "⚠️ Admin already exists or creation failed"
 
+# ============================================
+# 🐍 اجرای FastAPI
+# ============================================
 echo "🐍 Starting FastAPI backend..."
-exec python -m app.main  # ✅ اجرای app.main از داخل backend
+cd /app/backend
+exec python -m app.main
