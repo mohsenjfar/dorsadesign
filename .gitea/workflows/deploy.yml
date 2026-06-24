@@ -37,6 +37,7 @@ jobs:
       FRONTEND_URL: ${{ vars.FRONTEND_URL }}
       PIP_INDEX_URL: ${{ vars.PIP_INDEX_URL || 'https://pypi.org/simple' }}
       NPM_REGISTRY: ${{ vars.NPM_REGISTRY || 'https://registry.npmjs.org' }}
+      VITE_API_URL: ${{ vars.VITE_API_URL || 'https://dorsadesign.ir' }}
 
     steps:
       - name: 1️⃣ Checkout Source
@@ -62,7 +63,7 @@ jobs:
           docker build \
             --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
             --build-arg NPM_REGISTRY="${NPM_REGISTRY}" \
-            --build-arg VITE_API_URL="${VITE_API_URL:-https://dorsadesign.ir}" \
+            --build-arg VITE_API_URL="${VITE_API_URL}" \
             -t dorsadesign:$IMAGE_TAG .
 
       - name: 4️⃣ Start Application Container
