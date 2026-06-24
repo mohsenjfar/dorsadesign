@@ -26,8 +26,12 @@ RUN pip install --no-cache-dir \
 # کپی کد بک‌اند
 # ============================================
 COPY backend/ ./backend/
-COPY alembic.ini ./alembic.ini
-COPY alembic/ ./alembic/
+
+# ============================================
+# ✅ کپی فایل‌های Alembic از مسیر درست
+# ============================================
+COPY backend/alembic.ini ./alembic.ini
+COPY backend/alembic/ ./alembic/
 
 # ============================================
 # مرحله ۲: ساخت فرانت‌اند (Node.js)
