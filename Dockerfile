@@ -51,7 +51,7 @@ RUN npm config set registry ${NPM_REGISTRY}
 
 # کپی package.json و نصب وابستگی‌ها
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # کپی کد فرانت‌اند و Build
 COPY frontend/ ./
