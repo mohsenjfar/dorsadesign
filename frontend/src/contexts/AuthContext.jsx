@@ -100,6 +100,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Logout error:', error)
+      // حتی اگر خطا هم باشد، توکن را پاک می‌کنیم
     } finally {
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')

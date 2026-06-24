@@ -29,7 +29,10 @@
     "loading": "Loading...",
     "no_projects": "No projects found",
     "error": "Error loading projects",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "featured": "Featured",
+    "views": "views",
+    "square_meters": "m²"
   },
   "footer": {
     "tagline": "Architecture & Design Portfolio",

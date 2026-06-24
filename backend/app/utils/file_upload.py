@@ -64,7 +64,14 @@ async def save_upload_file(
     Returns:
         The saved file path (relative to uploads directory)
     """
-    ensure_upload_dirs()
+    try:
+        ensure_upload_dirs()
+    except Exception as e:
+        logger.error(f"Failed to create upload directories: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Upload directory is not accessible. Please check permissions."
+        )
 
     # Generate unique filename
     file_ext = Path(file.filename).suffix.lower()
@@ -98,8 +105,20 @@ async def save_upload_file(
         # Return relative path
         return f"/uploads/{subdirectory}/{filename}"
 
+    except PermissionError as e:
+        logger.error(f"Permission error while saving file: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied. Cannot write file to upload directory."
+        )
+    except OSError as e:
+        logger.error(f"OS error while saving file: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="File system error. Please try again later."
+        )
     except Exception as e:
-        logger.error(f"Error saving file: {e}")
+        logger.error(f"Unexpected error while saving file: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to save file: {str(e)}"

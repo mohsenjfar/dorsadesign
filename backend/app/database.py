@@ -26,11 +26,6 @@ SessionLocal = sessionmaker(
 # ✅ Base for all models
 Base = declarative_base()
 
-# ============================================
-# ✅ IMPORTANT: Import all models for Alembic
-# ============================================
-# This ensures Alembic can discover all models
-from app.models import Project, Admin  # noqa
 
 def get_db():
     db = SessionLocal()

@@ -1,0 +1,81 @@
+name: Deploy dorsadesign
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: dorsadesign
+
+    env:
+      BRANCH: ${{ github.ref_name }}
+
+      # ============================================
+      # 🔐 Secrets (از Gitea Secrets)
+      # ============================================
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
+      # ============================================
+      # 📝 Variables (از Gitea Variables)
+      # ============================================
+      POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ vars.ACCESS_TOKEN_EXPIRE_MINUTES || 30 }}
+      REFRESH_TOKEN_EXPIRE_DAYS: ${{ vars.REFRESH_TOKEN_EXPIRE_DAYS || 7 }}
+      CORS_ORIGINS: ${{ vars.CORS_ORIGINS }}
+      ALLOWED_HOSTS: ${{ vars.ALLOWED_HOSTS }}
+      DEBUG: ${{ vars.DEBUG || 'False' }}
+      UPLOAD_DIR: ${{ vars.UPLOAD_DIR || './uploads' }}
+      MAX_UPLOAD_SIZE: ${{ vars.MAX_UPLOAD_SIZE || 10485760 }}
+      ALLOWED_EXTENSIONS: ${{ vars.ALLOWED_EXTENSIONS || '.jpg,.jpeg,.png,.webp,.gif' }}
+      LOG_LEVEL: ${{ vars.LOG_LEVEL || 'INFO' }}
+      LOG_FILE: ${{ vars.LOG_FILE || './logs/app.log' }}
+      FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+
+    steps:
+      - name: 1️⃣ Checkout Source
+        shell: bash
+        run: |
+          set -e
+          REPO_URL="ssh://git@87.248.139.251:2222/ARACOM/dorsadesign.ir.git"
+
+          rm -rf repo
+          git clone --depth 1 --branch "$BRANCH" "$REPO_URL" repo
+
+      - name: 2️⃣ Set Image Tag
+        shell: bash
+        run: |
+          set -e
+          echo "IMAGE_TAG=prod" >> $GITHUB_ENV
+
+      - name: 3️⃣ Build Docker Image
+        shell: bash
+        run: |
+          set -e
+          cd repo
+          docker build -t dorsadesign:$IMAGE_TAG .
+
+      - name: 4️⃣ Start Application Container
+        shell: bash
+        run: |
+          set -e
+          cd repo
+          docker compose up -d app
+
+      - name: 5️⃣ Cleanup Workspace
+        shell: bash
+        run: |
+          set -e
+          cd repo
+          git clean -fdx || true
+
+      - name: 6️⃣ Health Check
+        shell: bash
+        run: |
+          echo "🏥 Checking service health..."
+          sleep 10
+          curl -f http://localhost:80/health || echo "⚠️ Health check failed"

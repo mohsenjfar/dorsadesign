@@ -1,8 +1,8 @@
 # backend/app/api/auth.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone
+from app.core.rate_limit import limiter
 from app.database import get_db
 from app.crud.admin import admin_crud
 from app.core.security import (
@@ -29,7 +29,9 @@ router = APIRouter(tags=["Authentication"])
 # ============================================
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("5/minute")
 async def login(
+    request: Request,
     login_data: AdminLogin,
     db: Session = Depends(get_db),
 ):

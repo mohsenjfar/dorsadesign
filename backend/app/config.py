@@ -23,6 +23,9 @@ class Settings:
     
     # CORS
     CORS_ORIGINS: list = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
+
+    # Trusted Hosts
+    ALLOWED_HOSTS: list = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
     
     # Upload
     UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "./uploads")
