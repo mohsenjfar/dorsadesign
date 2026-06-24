@@ -70,7 +70,8 @@ jobs:
         run: |
           set -e
           cd repo
-          docker compose up -d app
+          docker compose down app
+          docker compose up -d --build app
 
       - name: 5️⃣ Health Check
         shell: bash
