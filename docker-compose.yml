@@ -66,3 +66,5 @@ volumes:
     name: dorsadesign_uploads_data
   logs_data:
     name: dorsadesign_logs_data
+
+# Teset
