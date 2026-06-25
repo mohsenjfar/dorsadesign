@@ -64,7 +64,7 @@ jobs:
         run: |
           set -e
           cd repo
-          docker build \
+          docker build --no-cache \
             --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
             --build-arg NPM_REGISTRY="${NPM_REGISTRY}" \
             --build-arg VITE_API_URL="${VITE_API_URL}" \
@@ -77,7 +77,7 @@ jobs:
           cd repo
           docker compose down app
           docker rmi dorsadesign:prod || true
-          docker compose up -d --build --no-cache app
+          docker compose up -d app
 
       - name: 5️⃣ Health Check
         shell: bash
