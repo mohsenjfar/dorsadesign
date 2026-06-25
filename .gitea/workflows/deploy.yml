@@ -65,7 +65,7 @@ jobs:
         run: |
           set -e
           cd repo
-          docker build --no-cache \
+          docker build \
             --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
             --build-arg NPM_REGISTRY="${NPM_REGISTRY}" \
             --build-arg VITE_API_URL="${VITE_API_URL}" \
