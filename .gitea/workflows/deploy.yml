@@ -76,7 +76,8 @@ jobs:
           set -e
           cd repo
           docker compose down app
-          docker compose up -d --build app
+          docker rmi dorsadesign:prod || true
+          docker compose up -d --build --no-cache app
 
       - name: 5️⃣ Health Check
         shell: bash
