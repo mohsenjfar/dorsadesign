@@ -1,8 +1,14 @@
 // frontend/src/services/api.js
 import axios from 'axios'
 
+// ============================================
+// ✅ تنظیم baseURL با لاگ برای دیباگ
+// ============================================
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+console.log('🔵 API Base URL:', API_BASE_URL)  // ← برای دیباگ
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,7 +20,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // اضافه کردن زبان
-    const language = localStorage.getItem('i18nextLng') || 'en'
+    const language = localStorage.getItem('i18nextLng') || 'fa'
     config.params = {
       ...config.params,
       language: language,
@@ -26,9 +32,17 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
 
+    console.log('📤 API Request:', {
+      method: config.method?.toUpperCase(),
+      url: `${config.baseURL}${config.url}`,
+      params: config.params,
+      headers: config.headers,
+    })  // ← برای دیباگ
+
     return config
   },
   (error) => {
+    console.error('❌ Request Error:', error)
     return Promise.reject(error)
   }
 )
@@ -37,9 +51,24 @@ api.interceptors.request.use(
 // ✅ Interceptor برای مدیریت خطاهای 401
 // ============================================
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ API Response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data,
+    })  // ← برای دیباگ
+    return response
+  },
   async (error) => {
     const originalRequest = error.config
+
+    // لاگ خطا برای دیباگ
+    console.error('❌ API Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      url: originalRequest?.url,
+      method: originalRequest?.method,
+    })
 
     // اگر خطای 401 بود و قبلاً برای refresh تلاش نکرده بودیم
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -65,6 +94,7 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${access_token}`
         return api(originalRequest)
       } catch (refreshError) {
+        console.error('❌ Refresh token failed:', refreshError)
         // اگر رفرش ناموفق بود، کاربر را به لاگین هدایت کن
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
@@ -87,7 +117,7 @@ export const getProjects = async (params = {}) => {
     const response = await api.get('/api/projects', { params })
     return response.data
   } catch (error) {
-    console.error('Error fetching projects:', error)
+    console.error('❌ Error fetching projects:', error)
     throw error
   }
 }
@@ -97,7 +127,7 @@ export const getFeaturedProjects = async (limit = 4) => {
     const response = await api.get('/api/projects/featured', { params: { limit } })
     return response.data
   } catch (error) {
-    console.error('Error fetching featured projects:', error)
+    console.error('❌ Error fetching featured projects:', error)
     throw error
   }
 }
@@ -107,7 +137,7 @@ export const getProjectBySlug = async (slug) => {
     const response = await api.get(`/api/projects/${slug}`)
     return response.data
   } catch (error) {
-    console.error('Error fetching project details:', error)
+    console.error('❌ Error fetching project details:', error)
     throw error
   }
 }
