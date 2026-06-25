@@ -42,22 +42,8 @@ jobs:
       ADMIN_USERNAME: ${{ vars.ADMIN_USERNAME || 'admin' }}
       ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL || 'admin@dorsadesign.ir' }}
       ADMIN_FULL_NAME: ${{ vars.ADMIN_FULL_NAME || 'Admin User' }}
-      
-      # ============================================
-      # 🐳 Docker Registry Mirror
-      # ============================================
-      DOCKER_REGISTRY_MIRROR: ${{ vars.DOCKER_REGISTRY_MIRROR || 'https://docker.arvancloud.ir' }}
 
     steps:
-      - name: 0️⃣ Setup Docker Registry Mirror
-        shell: bash
-        run: |
-          set -e
-          echo "🔧 Setting Docker registry mirror to: ${DOCKER_REGISTRY_MIRROR}"
-          sudo mkdir -p /etc/docker
-          echo "{\"registry-mirrors\": [\"${DOCKER_REGISTRY_MIRROR}\"]}" | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker
-          echo "✅ Docker registry mirror configured successfully"
 
       - name: 1️⃣ Checkout Source
         shell: bash
