@@ -1,0 +1,149 @@
+.
+├── backend
+│   ├── alembic
+│   │   ├── versions
+│   │   │   ├── 0cec3e26217b_make_project_fields_multilingual_json.py
+│   │   │   ├── 3408de26aa9a_create_projects_table.py
+│   │   │   └── df927fcb46cd_create_admins_table.py
+│   │   ├── env.py
+│   │   ├── README
+│   │   └── script.py.mako
+│   ├── app
+│   │   ├── api
+│   │   │   ├── admin
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── projects.py
+│   │   │   ├── auth.py
+│   │   │   ├── __init__.py
+│   │   │   └── projects.py
+│   │   ├── core
+│   │   │   ├── exceptions.py
+│   │   │   ├── __init__.py
+│   │   │   ├── rate_limit.py
+│   │   │   └── security.py
+│   │   ├── crud
+│   │   │   ├── admin.py
+│   │   │   ├── __init__.py
+│   │   │   └── project.py
+│   │   ├── models
+│   │   │   ├── admin.py
+│   │   │   ├── __init__.py
+│   │   │   └── project.py
+│   │   ├── schemas
+│   │   │   ├── admin.py
+│   │   │   ├── __init__.py
+│   │   │   └── project.py
+│   │   ├── utils
+│   │   │   ├── file_upload.py
+│   │   │   └── mage_optimizer.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── __init__.py
+│   │   └── main.py
+│   ├── requirements
+│   │   ├── base.txt
+│   │   ├── dev.txt
+│   │   └── prod.txt
+│   ├── tests
+│   │   ├── conftest.py
+│   │   ├── __init__.py
+│   │   ├── test_api_admin.py
+│   │   ├── test_api_auth.py
+│   │   ├── test_api_projects.py
+│   │   ├── test_crud.py
+│   │   ├── test_models.py
+│   │   └── test_utils.py
+│   ├── uploads
+│   │   └── projects
+│   │       ├── covers
+│   │       │   └── .gitkeep
+│   │       └── galleries
+│   │           ├── b93ae61e-bd4b-47ec-b4b4-01eff339fbc4.jpeg
+│   │           └── .gitkeep
+│   ├── alembic.ini
+│   └── seed_admin.py
+├── frontend
+│   ├── public
+│   │   ├── videos
+│   │   │   ├── hero-bg.mp4
+│   │   │   ├── hero-bg-v2.mp4
+│   │   │   ├── hero-bg-v3.mp4
+│   │   │   └── hero-bg-v4.mp4
+│   │   └── favicon.ico
+│   ├── src
+│   │   ├── assets
+│   │   │   ├── hero.png
+│   │   │   ├── react.svg
+│   │   │   └── vite.svg
+│   │   ├── components
+│   │   │   ├── admin
+│   │   │   │   ├── AdminLayout.jsx
+│   │   │   │   ├── ImageUpload.jsx
+│   │   │   │   ├── ProjectForm.jsx
+│   │   │   │   └── ProtectedRoute.jsx
+│   │   │   ├── common
+│   │   │   │   ├── Footer.jsx
+│   │   │   │   ├── Header.jsx
+│   │   │   │   └── Layout.jsx
+│   │   │   └── home
+│   │   │       ├── FilterBar.jsx
+│   │   │       ├── Hero.jsx
+│   │   │       ├── ProjectCard.jsx
+│   │   │       └── ProjectGrid.jsx
+│   │   ├── contexts
+│   │   │   ├── AuthContext.jsx
+│   │   │   ├── LanguageContext.jsx
+│   │   │   └── ThemeContext.jsx
+│   │   ├── hooks
+│   │   │   └── useProjects.js
+│   │   ├── locales
+│   │   │   ├── en
+│   │   │   │   └── translation.json
+│   │   │   ├── fa
+│   │   │   │   └── translation.json
+│   │   │   └── i18n
+│   │   │       └── index.js
+│   │   ├── pages
+│   │   │   ├── admin
+│   │   │   │   ├── CreateProject.jsx
+│   │   │   │   ├── Dashboard.jsx
+│   │   │   │   ├── EditProject.jsx
+│   │   │   │   ├── Login.jsx
+│   │   │   │   └── Profile.jsx
+│   │   │   ├── About.jsx
+│   │   │   ├── Contact.jsx
+│   │   │   ├── Home.jsx
+│   │   │   └── ProjectDetail.jsx
+│   │   ├── services
+│   │   │   ├── api.js
+│   │   │   └── projectService.js
+│   │   ├── styles
+│   │   │   └── index.css
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── eslint.config.js
+│   ├── .gitignore
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── postcss.config.js
+│   ├── README.md
+│   ├── tailwind.config.js
+│   └── vite.config.js
+├── .gitea
+│   └── workflows
+│       └── deploy.yml
+├── docker-compose.yml
+├── docker-entrypoint.sh
+├── Dockerfile
+├── .env
+├── .env.example
+├── extract.sh
+├── .gitignore
+├── License
+├── README.md
+├── tree.sh
+└── tree.txt
+
+39 directories, 108 files
