@@ -59,7 +59,7 @@ ARG PIP_INDEX_URL
 ENV PIP_INDEX_URL=${PIP_INDEX_URL:-https://pypi.org/simple}
 
 # ============================================
-# ✅ لایه ۱: وابستگی‌ها (از مرحله backend - بدون نصب مجدد)
+# ✅ لایه ۱: وابستگی‌ها (از مرحله backend)
 # ============================================
 COPY --from=backend /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=backend /usr/local/bin /usr/local/bin
@@ -75,11 +75,9 @@ COPY --from=backend /app/backend ./backend/
 COPY --from=frontend-builder /app/dist ./frontend/dist
 
 # ============================================
-# ✅ ایجاد پوشه‌های مورد نیاز
+# ✅ ایجاد پوشه‌های مورد نیاز (بر اساس ساختار پروژه)
 # ============================================
-RUN mkdir -p /app/uploads/projects/covers \
-    /app/uploads/projects/galleries \
-    /app/logs
+RUN mkdir -p /app/uploads /app/logs
 
 # ============================================
 # ✅ کپی اسکریپت ورودی
