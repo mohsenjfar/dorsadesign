@@ -45,7 +45,7 @@ services:
       - ALLOWED_EXTENSIONS
       - LOG_LEVEL
       - LOG_FILE
-      - VITE_API_URL=http://app:8000
+      - VITE_API_URL=https://dorsadesign.ir
       - FRONTEND_URL
     depends_on:
       postgres:
