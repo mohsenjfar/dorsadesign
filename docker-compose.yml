@@ -45,7 +45,7 @@ services:
       - ALLOWED_EXTENSIONS
       - LOG_LEVEL
       - LOG_FILE
-      - VITE_API_URL
+      - VITE_API_URL=http://app:8000
       - FRONTEND_URL
     depends_on:
       postgres:
