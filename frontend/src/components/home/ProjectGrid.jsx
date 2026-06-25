@@ -5,6 +5,7 @@ import { FiLoader } from 'react-icons/fi'
 
 const ProjectGrid = ({ projects, loading, error }) => {
   const { t } = useTranslation()  // ✅ اضافه کنید
+  console.log('🔍 ProjectGrid received:', { projects, loading, error })
 
   if (loading) {
     return (

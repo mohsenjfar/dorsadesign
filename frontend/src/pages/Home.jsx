@@ -15,6 +15,8 @@ const Home = () => {
     project_type: null,
   })
 
+  console.log('🏠 Home page projects:', projects) 
+  
   useEffect(() => {
     if (location.hash === '#projects') {
       const el = document.getElementById('projects')

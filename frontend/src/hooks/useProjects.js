@@ -30,6 +30,7 @@ export const useProjects = (initialFilters = {}) => {
         ...newFilters,
       }
       const data = await getProjects(params)
+      console.log('📦 Projects data from API:', data)
       setProjects(data.items || [])
       setPagination({
         total: data.total || 0,
