@@ -44,7 +44,6 @@ jobs:
       ADMIN_FULL_NAME: ${{ vars.ADMIN_FULL_NAME || 'Admin User' }}
 
     steps:
-
       - name: 1️⃣ Checkout Source
         shell: bash
         run: |
@@ -77,8 +76,7 @@ jobs:
           set -e
           cd repo
           docker compose down app
-          docker rmi dorsadesign:prod || true
-          docker compose up -d app
+          docker compose up -d --build app
 
       - name: 5️⃣ Health Check
         shell: bash
