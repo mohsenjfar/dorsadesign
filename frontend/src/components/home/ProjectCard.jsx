@@ -81,7 +81,7 @@ const ProjectCard = ({ project, index }) => {
     if (!url) return null
     // اگر URL با /uploads شروع می‌شود، به backend اشاره می‌کند
     if (url.startsWith('/uploads')) {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://dorsadesign.ir'
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
       return `${apiUrl}${url}`
     }
     return url
