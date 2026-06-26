@@ -5,34 +5,11 @@ from typing import Optional, List, Tuple
 from uuid import UUID
 from app.models.project import Project, ProjectStatus, ProjectType
 from app.schemas.project import ProjectCreate, ProjectUpdate
-import re
-
-
-def generate_slug_from_title(title: str) -> str:
-    """تولید اسلاگ از عنوان"""
-    if not title:
-        return 'untitled'
-    slug = re.sub(r'[^a-z0-9]+', '-', title.lower().strip())
-    slug = re.sub(r'^-+|-+$', '', slug)
-    return slug or 'untitled'
-
-
-def get_unique_slug(db: Session, base_slug: str) -> str:
-    """تولید اسلاگ یکتا"""
-    slug = base_slug
-    counter = 1
-    while db.query(Project).filter(Project.slug == slug).first():
-        slug = f"{base_slug}-{counter}"
-        counter += 1
-    return slug
 
 
 class ProjectCRUD:
     def get(self, db: Session, project_id: UUID) -> Optional[Project]:
         return db.query(Project).filter(Project.id == project_id).first()
-
-    def get_by_slug(self, db: Session, slug: str) -> Optional[Project]:
-        return db.query(Project).filter(Project.slug == slug).first()
 
     def get_multi(
         self,
@@ -79,15 +56,8 @@ class ProjectCRUD:
         return projects
 
     def create(self, db: Session, *, obj_in: ProjectCreate) -> Project:
-        # ✅ تولید اسلاگ اگر ارسال نشده باشد
-        slug = obj_in.slug
-        if not slug:
-            base_slug = generate_slug_from_title(obj_in.title)
-            slug = get_unique_slug(db, base_slug)
-
         db_obj = Project(
             title=obj_in.title,
-            slug=slug,
             description=obj_in.description,
             full_description=obj_in.full_description,
             features=",".join(obj_in.features) if obj_in.features else None,
