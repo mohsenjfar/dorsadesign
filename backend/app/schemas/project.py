@@ -29,7 +29,7 @@ class MultiLingualList(BaseModel):
 class ProjectBase(BaseModel):
     """Base project schema with multilingual fields"""
     title: MultiLingualText
-    slug: str = Field(..., min_length=3, max_length=255)
+    slug: Optional[str] = Field(None, min_length=3, max_length=255)
     description: Optional[MultiLingualText] = None
     full_description: Optional[MultiLingualText] = None
     features: Optional[MultiLingualList] = None
