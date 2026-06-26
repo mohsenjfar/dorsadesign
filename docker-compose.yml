@@ -17,17 +17,14 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_DB
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dorsa -d dorsadesign"] #
+      test: ["CMD-SHELL", "pg_isready -U dorsa -d dorsadesign"]
       interval: 30s
       timeout: 10s
       retries: 5
 
-  # ============================================
-  # 🚀 Application
-  # ============================================
-  app:
+  backend:
     image: dorsadesign:${IMAGE_TAG}
-    container_name: dorsadesign-app
+    container_name: dorsadesign-backend
     restart: unless-stopped
     volumes:
       - uploads_data:/app/uploads
@@ -45,20 +42,18 @@ services:
       - ALLOWED_EXTENSIONS
       - LOG_LEVEL
       - LOG_FILE
-      - VITE_API_URL=https://dorsadesign.ir
-      - FRONTEND_URL
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - external-net
 
-
-networks:
-  external-net:
-    external: true
-    name: external-net
-
+  frontend:
+    image: dorsadesign-frontend:${IMAGE_TAG}
+    container_name: dorsadesign-frontend
+    restart: unless-stopped
+    networks:
+      - external-net
 
 volumes:
   postgres_data:
@@ -67,3 +62,8 @@ volumes:
     name: dorsadesign_uploads_data
   logs_data:
     name: dorsadesign_logs_data
+
+networks:
+  external-net:
+    external: true
+    name: external-net

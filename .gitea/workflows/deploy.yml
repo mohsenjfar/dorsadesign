@@ -12,17 +12,11 @@ jobs:
     env:
       BRANCH: ${{ github.ref_name }}
 
-      # ============================================
-      # 🔐 Secrets (از Gitea Secrets)
-      # ============================================
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'admin123' }}
 
-      # ============================================
-      # 📝 Variables (از Gitea Variables)
-      # ============================================
       POSTGRES_USER: ${{ vars.POSTGRES_USER }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${{ vars.ACCESS_TOKEN_EXPIRE_MINUTES || 30 }}
@@ -59,32 +53,35 @@ jobs:
           set -e
           echo "IMAGE_TAG=prod" >> $GITHUB_ENV
 
-      - name: 3️⃣ Build Docker Image
+      - name: 3️⃣ Build Backend Image
         shell: bash
         run: |
           set -e
           cd repo
           docker build \
             --build-arg PIP_INDEX_URL="${PIP_INDEX_URL}" \
-            --build-arg NPM_REGISTRY="${NPM_REGISTRY}" \
-            --build-arg VITE_API_URL="${VITE_API_URL}" \
-            -t dorsadesign:$IMAGE_TAG .
+            -f Dockerfile.backend \
+            -t dorsadesign-backend:$IMAGE_TAG .
 
-      - name: 4️⃣ Start Application Container
+      - name: 4️⃣ Build Frontend Image
         shell: bash
         run: |
           set -e
           cd repo
-          docker compose down app
-          docker compose up -d --build app
+          docker build \
+            --build-arg NPM_REGISTRY="${NPM_REGISTRY}" \
+            --build-arg VITE_API_URL="${VITE_API_URL}" \
+            -f Dockerfile.frontend \
+            -t dorsadesign-frontend:$IMAGE_TAG .
 
-      - name: 5️⃣ Health Check
+      - name: 5️⃣ Start Services
         shell: bash
         run: |
-          echo "🏥 Checking service health..."
-          sleep 10
-          curl -f http://localhost:80/health || echo "⚠️ Health check failed"
-
+          set -e
+          cd repo
+          docker compose down
+          docker compose up -d --build
+      
       - name: 6️⃣ Cleanup Workspace
         shell: bash
         run: |
