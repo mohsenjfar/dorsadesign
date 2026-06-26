@@ -18,51 +18,10 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-
-# ============================================
-# Helper Functions
-# ============================================
-
-def get_translation(data: dict, language: str) -> str:
-    """
-    دریافت مقدار ترجمه‌شده از یک دیکشنری JSON
-    
-    Args:
-        data: دیکشنری حاوی ترجمه‌ها (مثلاً {'en': '...', 'fa': '...'})
-        language: زبان مورد نظر (en/fa)
-    
-    Returns:
-        مقدار ترجمه‌شده یا رشته خالی
-    """
-    if not isinstance(data, dict):
-        return str(data) if data else ""
-    return data.get(language, data.get('en', ''))
-
-
-def get_translated_list(data: dict, language: str) -> list:
-    """
-    دریافت لیست ترجمه‌شده از یک دیکشنری JSON
-    
-    Args:
-        data: دیکشنری حاوی لیست ترجمه‌ها (مثلاً {'en': [...], 'fa': [...]})
-        language: زبان مورد نظر (en/fa)
-    
-    Returns:
-        لیست ترجمه‌شده یا لیست خالی
-    """
-    if not isinstance(data, dict):
-        return []
-    return data.get(language, data.get('en', []))
-
-
-# ============================================
-# Public Endpoints
-# ============================================
-
 @router.get("/", response_model=ProjectList)
 async def get_projects(
     db: Session = Depends(get_db),
-    language: str = Query('en', description="Language (en/fa)"),
+    language: str = Query('fa', description="Language"),
     skip: int = Query(0, ge=0, description="Number of items to skip"),
     limit: int = Query(20, ge=1, le=100, description="Number of items to return"),
     project_type: Optional[ProjectType] = Query(None, description="Filter by project type"),

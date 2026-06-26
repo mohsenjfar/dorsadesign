@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: dorsadesign
+    runs-on: none
 
     env:
       BRANCH: ${{ github.ref_name }}

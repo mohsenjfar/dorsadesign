@@ -1,38 +1,22 @@
 # backend/app/schemas/project.py
-from pydantic import BaseModel, Field, model_validator
-from datetime import datetime
-from typing import Optional, List, Dict, Any, Union
+from pydantic import BaseModel, Field
+from typing import Optional, List
 from uuid import UUID
+from datetime import datetime
 from app.models.project import ProjectStatus, ProjectType
 
 
 # ============================================
-# Multilingual Base Models
-# ============================================
-
-class MultiLingualText(BaseModel):
-    """Model for multilingual text fields"""
-    en: str = Field(..., description="English text")
-    fa: str = Field(..., description="Persian text")
-
-
-class MultiLingualList(BaseModel):
-    """Model for multilingual list fields"""
-    en: List[str] = Field(default=[], description="English list")
-    fa: List[str] = Field(default=[], description="Persian list")
-
-
-# ============================================
-# Project Schemas
+# ✅ مدل‌های تک‌زبانه (فقط فارسی)
 # ============================================
 
 class ProjectBase(BaseModel):
-    """Base project schema with multilingual fields"""
-    title: MultiLingualText
-    slug: Optional[str] = Field(None, min_length=3, max_length=255)
-    description: Optional[MultiLingualText] = None
-    full_description: Optional[MultiLingualText] = None
-    features: Optional[MultiLingualList] = None
+    """Base project schema - فقط فارسی"""
+    title: str = Field(..., min_length=1, max_length=255, description="عنوان پروژه")
+    slug: Optional[str] = Field(None, min_length=3, max_length=255, description="شناسه یکتا")
+    description: Optional[str] = Field(None, description="توضیحات کوتاه")
+    full_description: Optional[str] = Field(None, description="توضیحات کامل")
+    features: Optional[List[str]] = Field(default=[], description="ویژگی‌ها")
     project_type: Optional[ProjectType] = None
     client_name: Optional[str] = Field(None, max_length=255)
     year: Optional[str] = Field(None, max_length=20)
@@ -50,11 +34,11 @@ class ProjectCreate(ProjectBase):
 
 class ProjectUpdate(BaseModel):
     """Schema for updating an existing project"""
-    title: Optional[MultiLingualText] = None
+    title: Optional[str] = Field(None, min_length=1, max_length=255)
     slug: Optional[str] = Field(None, min_length=3, max_length=255)
-    description: Optional[MultiLingualText] = None
-    full_description: Optional[MultiLingualText] = None
-    features: Optional[MultiLingualList] = None
+    description: Optional[str] = None
+    full_description: Optional[str] = None
+    features: Optional[List[str]] = None
     project_type: Optional[ProjectType] = None
     client_name: Optional[str] = Field(None, max_length=255)
     year: Optional[str] = Field(None, max_length=20)
@@ -66,19 +50,17 @@ class ProjectUpdate(BaseModel):
 
 
 # ============================================
-# Response Schemas (با پشتیبانی از زبان)
+# ✅ Response Schemas
 # ============================================
 
-# backend/app/schemas/project.py
-
 class ProjectResponse(BaseModel):
-    """Schema for project response with language support"""
+    """Schema for project response"""
     id: UUID
-    title: Union[str, Dict[str, str]] = Field(..., description="Title (translated or full JSON)")
+    title: str
     slug: str
-    description: Optional[Union[str, Dict[str, str]]] = Field(None, description="Description")
-    full_description: Optional[Union[str, Dict[str, str]]] = Field(None, description="Full description")
-    features: Optional[Union[List[str], Dict[str, List[str]]]] = Field(None, description="Features")
+    description: Optional[str] = None
+    full_description: Optional[str] = None
+    features: Optional[List[str]] = []
     project_type: Optional[ProjectType] = None
     client_name: Optional[str] = None
     year: Optional[str] = None
@@ -94,44 +76,22 @@ class ProjectResponse(BaseModel):
     class Config:
         from_attributes = True
 
-    # ============================================
-    # ✅ Validator: داده‌های JSON را به همان شکل نگه می‌دارد
-    # ============================================
-    @model_validator(mode='before')
-    @classmethod
-    def validate_translations(cls, data: Any) -> Any:
-        """Keep JSON data as-is, don't modify"""
-        return data
-
 
 class ProjectListResponse(BaseModel):
     """Schema for project list response (lightweight)"""
     id: UUID
-    title: Union[str, Dict[str, str]] = Field(..., description="Title")
+    title: str
     slug: str
-    description: Optional[Union[str, Dict[str, str]]] = Field(None, description="Description")
+    description: Optional[str] = None
     cover_image: Optional[str] = None
     project_type: Optional[ProjectType] = None
     is_featured: bool
-    features: Optional[Union[List[str], Dict[str, List[str]]]] = Field(default=[], description="Features")
-    views: int = Field(default=0, description="View count")
+    features: Optional[List[str]] = []
+    views: int = 0
     created_at: datetime
 
     class Config:
         from_attributes = True
-
-    # ✅ Validator برای تبدیل خودکار
-    @model_validator(mode='before')
-    @classmethod
-    def validate_translations(cls, data: Any) -> Any:
-        if isinstance(data, dict):
-            if 'title' in data and isinstance(data['title'], dict):
-                data['title'] = data['title'].get('en', '')
-            if 'description' in data and isinstance(data['description'], dict):
-                data['description'] = data['description'].get('en', '')
-            if 'features' in data and isinstance(data['features'], dict):
-                data['features'] = data['features'].get('en', [])
-        return data
 
 
 class ProjectList(BaseModel):

@@ -5,17 +5,33 @@ from typing import Optional, List, Tuple
 from uuid import UUID
 from app.models.project import Project, ProjectStatus, ProjectType
 from app.schemas.project import ProjectCreate, ProjectUpdate
+import re
+
+
+def generate_slug_from_title(title: str) -> str:
+    """تولید اسلاگ از عنوان"""
+    if not title:
+        return 'untitled'
+    slug = re.sub(r'[^a-z0-9]+', '-', title.lower().strip())
+    slug = re.sub(r'^-+|-+$', '', slug)
+    return slug or 'untitled'
+
+
+def get_unique_slug(db: Session, base_slug: str) -> str:
+    """تولید اسلاگ یکتا"""
+    slug = base_slug
+    counter = 1
+    while db.query(Project).filter(Project.slug == slug).first():
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+    return slug
 
 
 class ProjectCRUD:
-    """CRUD operations for Project model with multilingual support"""
-
     def get(self, db: Session, project_id: UUID) -> Optional[Project]:
-        """Get a single project by ID"""
         return db.query(Project).filter(Project.id == project_id).first()
 
     def get_by_slug(self, db: Session, slug: str) -> Optional[Project]:
-        """Get a single project by slug"""
         return db.query(Project).filter(Project.slug == slug).first()
 
     def get_multi(
@@ -28,71 +44,53 @@ class ProjectCRUD:
         status: Optional[ProjectStatus] = None,
         is_featured: Optional[bool] = None,
         search: Optional[str] = None,
-        language: str = 'en',  # ✅ برای جستجو در JSON
+        language: str = 'fa',
     ) -> Tuple[List[Project], int]:
-        """
-        Get multiple projects with filtering and pagination
-        
-        Returns: (list of projects, total count)
-        """
         query = db.query(Project)
 
-        # Apply filters
         if project_type:
             query = query.filter(Project.project_type == project_type)
 
         if status:
             query = query.filter(Project.status == status)
         else:
-            # Default: only show published projects
             query = query.filter(Project.status == ProjectStatus.PUBLISHED)
 
         if is_featured is not None:
             query = query.filter(Project.is_featured == is_featured)
 
-        # ✅ جستجو در فیلدهای JSON با استفاده از PostgreSQL JSONB
         if search:
             search_term = f"%{search}%"
             query = query.filter(
                 or_(
-                    Project.title[language].astext.ilike(search_term),
-                    Project.description[language].astext.ilike(search_term),
-                    # جستجو در هر دو زبان به عنوان fallback
-                    Project.title['en'].astext.ilike(search_term),
-                    Project.title['fa'].astext.ilike(search_term),
+                    Project.title.ilike(search_term),
+                    Project.description.ilike(search_term),
                 )
             )
 
-        # Get total count before pagination
         total = query.count()
-
-        # Order by created_at (newest first)
         query = query.order_by(desc(Project.created_at))
-
-        # Apply pagination
         projects = query.offset(skip).limit(limit).all()
 
         return projects, total
 
     def get_featured(self, db: Session, limit: int = 4) -> List[Project]:
-        """Get featured projects"""
-        projects, _ = self.get_multi(
-            db,
-            is_featured=True,
-            status=ProjectStatus.PUBLISHED,
-            limit=limit
-        )
+        projects, _ = self.get_multi(db, is_featured=True, status=ProjectStatus.PUBLISHED, limit=limit)
         return projects
 
     def create(self, db: Session, *, obj_in: ProjectCreate) -> Project:
-        """Create a new project with multilingual data"""
+        # ✅ تولید اسلاگ اگر ارسال نشده باشد
+        slug = obj_in.slug
+        if not slug:
+            base_slug = generate_slug_from_title(obj_in.title)
+            slug = get_unique_slug(db, base_slug)
+
         db_obj = Project(
-            # ✅ ذخیره به صورت دیکشنری برای فیلدهای JSON
-            title=obj_in.title.model_dump(),
-            slug=obj_in.slug,
-            description=obj_in.description.model_dump() if obj_in.description else None,
-            full_description=obj_in.full_description.model_dump() if obj_in.full_description else None,
-            features=obj_in.features.model_dump() if obj_in.features else None,
+            title=obj_in.title,
+            slug=slug,
+            description=obj_in.description,
+            full_description=obj_in.full_description,
+            features=",".join(obj_in.features) if obj_in.features else None,
             project_type=obj_in.project_type,
             client_name=obj_in.client_name,
             year=obj_in.year,
@@ -107,25 +105,12 @@ class ProjectCRUD:
         db.refresh(db_obj)
         return db_obj
 
-    def update(
-        self,
-        db: Session,
-        *,
-        db_obj: Project,
-        obj_in: ProjectUpdate
-    ) -> Project:
-        """Update an existing project with multilingual data"""
+    def update(self, db: Session, *, db_obj: Project, obj_in: ProjectUpdate) -> Project:
         update_data = obj_in.model_dump(exclude_unset=True)
 
         for field, value in update_data.items():
-            if field in ['title', 'description', 'full_description', 'features']:
-                # ✅ برای فیلدهای JSON، اگر value یک شیء Pydantic است، آن را به dict تبدیل کن
-                if hasattr(value, 'model_dump'):
-                    setattr(db_obj, field, value.model_dump())
-                elif isinstance(value, dict):
-                    setattr(db_obj, field, value)
-                else:
-                    setattr(db_obj, field, value)
+            if field == 'features' and value is not None:
+                setattr(db_obj, field, ",".join(value) if value else None)
             else:
                 setattr(db_obj, field, value)
 
@@ -135,7 +120,6 @@ class ProjectCRUD:
         return db_obj
 
     def delete(self, db: Session, *, project_id: UUID) -> Project:
-        """Delete a project"""
         db_obj = self.get(db, project_id)
         if db_obj:
             db.delete(db_obj)
@@ -143,7 +127,6 @@ class ProjectCRUD:
         return db_obj
 
     def increment_views(self, db: Session, *, project: Project) -> Project:
-        """Increment project view count"""
         project.views += 1
         db.add(project)
         db.commit()
@@ -151,5 +134,4 @@ class ProjectCRUD:
         return project
 
 
-# Create singleton instance
 project_crud = ProjectCRUD()
