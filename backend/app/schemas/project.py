@@ -13,7 +13,6 @@ from app.models.project import ProjectStatus, ProjectType
 class ProjectBase(BaseModel):
     """Base project schema - فقط فارسی"""
     title: str = Field(..., min_length=1, max_length=255, description="عنوان پروژه")
-    slug: Optional[str] = Field(None, min_length=3, max_length=255, description="شناسه یکتا")
     description: Optional[str] = Field(None, description="توضیحات کوتاه")
     full_description: Optional[str] = Field(None, description="توضیحات کامل")
     features: Optional[List[str]] = Field(default=[], description="ویژگی‌ها")
@@ -35,7 +34,6 @@ class ProjectCreate(ProjectBase):
 class ProjectUpdate(BaseModel):
     """Schema for updating an existing project"""
     title: Optional[str] = Field(None, min_length=1, max_length=255)
-    slug: Optional[str] = Field(None, min_length=3, max_length=255)
     description: Optional[str] = None
     full_description: Optional[str] = None
     features: Optional[List[str]] = None
@@ -57,7 +55,6 @@ class ProjectResponse(BaseModel):
     """Schema for project response"""
     id: UUID
     title: str
-    slug: str
     description: Optional[str] = None
     full_description: Optional[str] = None
     features: Optional[List[str]] = []
@@ -81,7 +78,6 @@ class ProjectListResponse(BaseModel):
     """Schema for project list response (lightweight)"""
     id: UUID
     title: str
-    slug: str
     description: Optional[str] = None
     cover_image: Optional[str] = None
     project_type: Optional[ProjectType] = None
