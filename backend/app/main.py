@@ -37,7 +37,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.router.redirect_slashes = False
 app.include_router(api_router, prefix="/api")
 
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
@@ -78,7 +77,7 @@ app.add_middleware(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
