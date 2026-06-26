@@ -22,11 +22,11 @@ export const useProjects = (initialFilters = {}) => {
     setLoading(true)
     setError(null)
     try {
-      const language = i18n.language || 'en'
+      const language = i18n.language
       const params = {
         skip: (pagination.page - 1) * pagination.pageSize,
         limit: pagination.pageSize,
-        language: language,
+        language: 'fa',
         ...newFilters,
       }
       const data = await getProjects(params)

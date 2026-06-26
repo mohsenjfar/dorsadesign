@@ -14,10 +14,9 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const language = localStorage.getItem('i18nextLng') || 'fa'
     config.params = {
       ...config.params,
-      language: language,
+      language: 'fa',
     }
 
     const token = localStorage.getItem('access_token')

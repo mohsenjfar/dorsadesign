@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { FiMenu, FiX, FiSun, FiMoon, FiGlobe, FiUser } from 'react-icons/fi'
+import { FiMenu, FiX, FiSun, FiMoon, FiUser } from 'react-icons/fi'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 
@@ -103,40 +103,6 @@ const Header = () => {
                 <FiMoon className="w-5 h-5 text-gray-600" />
               )}
             </button>
-
-            {/* Language Switcher */}
-            <div className="relative">
-
-              <button
-                onClick={() => setIsLangOpen(!isLangOpen)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors flex items-center gap-1"
-                aria-label="Change language"
-              >
-                <FiGlobe className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
-                  {currentLanguage === 'fa' ? 'فا' : 'En'}
-                </span>
-              </button>
-
-              {isLangOpen && (
-                <div className="absolute right-0 mt-2 py-2 w-40 bg-white dark:bg-dark-200 rounded-xl shadow-lg border border-gray-200 dark:border-dark-300">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => { changeLanguage(lang.code); setIsLangOpen(false); }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-dark-300 transition-colors flex items-center gap-2 ${
-                        currentLanguage === lang.code
-                          ? 'text-primary-600 dark:text-primary-400 font-medium'
-                          : 'text-gray-700 dark:text-gray-300'
-                      }`}
-                    >
-                      <span>{lang.flag}</span>
-                      {lang.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
 
             {/* ✅ Admin Login Button */}
             <button
