@@ -1,5 +1,5 @@
 // frontend/src/pages/admin/CreateProject.jsx
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
@@ -20,7 +20,7 @@ const CreateProject = () => {
   const MAX_GALLERY_IMAGES = 3
   
   // ============================================
-  // State فرم (فقط فارسی - بدون اسلاگ)
+  // State فرم (تک‌زبانه - فقط فارسی)
   // ============================================
   const [formData, setFormData] = useState({
     title: '',
@@ -76,7 +76,7 @@ const CreateProject = () => {
   }
 
   // ============================================
-  // ✅ آپلود تصویر کاور
+  // آپلود تصویر کاور
   // ============================================
   const uploadCoverImage = async (file) => {
     const formData = new FormData()
@@ -125,7 +125,7 @@ const CreateProject = () => {
   }
 
   // ============================================
-  // ✅ آپلود تصاویر گالری با محدودیت
+  // آپلود تصاویر گالری با محدودیت
   // ============================================
   const uploadGalleryImages = async (files) => {
     const formData = new FormData()
@@ -184,7 +184,7 @@ const CreateProject = () => {
   }
 
   // ============================================
-  // ارسال فرم (بدون اسلاگ)
+  // ارسال فرم (تک‌زبانه)
   // ============================================
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -193,18 +193,10 @@ const CreateProject = () => {
 
     try {
       const projectData = {
-        title: {
-          fa: formData.title
-        },
-        description: {
-          fa: formData.description
-        },
-        full_description: {
-          fa: formData.full_description
-        },
-        features: {
-          fa: formData.features.filter(f => f.trim())
-        },
+        title: formData.title,
+        description: formData.description,
+        full_description: formData.full_description,
+        features: formData.features.filter(f => f.trim()),
         project_type: formData.project_type,
         client_name: formData.client_name,
         year: formData.year,
@@ -376,7 +368,7 @@ const CreateProject = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* ===== بخش اطلاعات پروژه (فقط فارسی) ===== */}
+        {/* ===== بخش اطلاعات پروژه ===== */}
         <div className="bg-white dark:bg-dark-200 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-dark-300">
           <h2 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <span className="text-primary-600">🇮🇷</span>

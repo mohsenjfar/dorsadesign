@@ -25,7 +25,7 @@ const EditProject = () => {
   const MAX_GALLERY_IMAGES = 3
   
   // ============================================
-  // State فرم (فقط فارسی - بدون اسلاگ)
+  // State فرم (تک‌زبانه - فقط فارسی)
   // ============================================
   const [formData, setFormData] = useState({
     title: '',
@@ -56,16 +56,16 @@ const EditProject = () => {
         const data = response.data
 
         setFormData({
-          title: data.title?.fa || data.title || '',
-          description: data.description?.fa || data.description || '',
-          full_description: data.full_description?.fa || data.full_description || '',
+          title: data.title || '',
+          description: data.description || '',
+          full_description: data.full_description || '',
           project_type: data.project_type || 'residential',
           client_name: data.client_name || '',
           year: data.year || '',
           area: data.area || '',
           status: data.status || 'draft',
           is_featured: data.is_featured || false,
-          features: data.features?.fa || data.features || [],
+          features: data.features || [],
           cover_image: data.cover_image || null,
           cover_file: null,
           gallery_images: data.gallery_images ? data.gallery_images.split(',').filter(Boolean) : [],
@@ -225,7 +225,7 @@ const EditProject = () => {
   }
 
   // ============================================
-  // ارسال فرم (ویرایش - بدون اسلاگ)
+  // ارسال فرم (تک‌زبانه)
   // ============================================
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -238,18 +238,10 @@ const EditProject = () => {
       }
 
       const projectData = {
-        title: {
-          fa: formData.title
-        },
-        description: {
-          fa: formData.description
-        },
-        full_description: {
-          fa: formData.full_description
-        },
-        features: {
-          fa: formData.features.filter(f => f.trim())
-        },
+        title: formData.title,
+        description: formData.description,
+        full_description: formData.full_description,
+        features: formData.features.filter(f => f.trim()),
         project_type: formData.project_type,
         client_name: formData.client_name,
         year: formData.year,
@@ -444,7 +436,7 @@ const EditProject = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* ===== بخش اطلاعات پروژه (فقط فارسی) ===== */}
+        {/* ===== بخش اطلاعات پروژه ===== */}
         <div className="bg-white dark:bg-dark-200 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-dark-300">
           <h2 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <span className="text-primary-600">🇮🇷</span>

@@ -184,9 +184,6 @@ const Dashboard = () => {
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
                             {project.title}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            slug: {project.slug}
-                          </p>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
