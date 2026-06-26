@@ -1,5 +1,5 @@
 # backend/app/api/admin/projects.py
-from fastapi import APIRouter, Depends, status, File, UploadFile
+from fastapi import APIRouter, Depends, status, File, UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
@@ -20,45 +20,15 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# ============================================
+# محدودیت تعداد تصاویر گالری
+# ============================================
+MAX_GALLERY_IMAGES = 3
+
 
 # ============================================
 # Admin Project Management Endpoints
 # ============================================
-
-# ============================================
-# Helper Functions
-# ============================================
-
-def get_translation(data: dict, language: str) -> str:
-    """
-    دریافت مقدار ترجمه‌شده از یک دیکشنری JSON
-    
-    Args:
-        data: دیکشنری حاوی ترجمه‌ها (مثلاً {'en': '...', 'fa': '...'})
-        language: زبان مورد نظر (en/fa)
-    
-    Returns:
-        مقدار ترجمه‌شده یا رشته خالی
-    """
-    if not isinstance(data, dict):
-        return str(data) if data else ""
-    return data.get(language, data.get('en', ''))
-
-
-def get_translated_list(data: dict, language: str) -> list:
-    """
-    دریافت لیست ترجمه‌شده از یک دیکشنری JSON
-    
-    Args:
-        data: دیکشنری حاوی لیست ترجمه‌ها (مثلاً {'en': [...], 'fa': [...]})
-        language: زبان مورد نظر (en/fa)
-    
-    Returns:
-        لیست ترجمه‌شده یا لیست خالی
-    """
-    if not isinstance(data, dict):
-        return []
-    return data.get(language, data.get('en', []))
 
 @router.get("/by-id/{project_id}", response_model=ProjectResponse)
 async def get_project_by_id_admin(
@@ -66,12 +36,13 @@ async def get_project_by_id_admin(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """دریافت کامل پروژه با ID (بدون ترجمه) - شامل هر دو زبان"""
+    """دریافت کامل پروژه با ID"""
     project = project_crud.get(db, project_id)
     if not project:
         raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
 
     return ProjectResponse.model_validate(project)
+
 
 @router.post("/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
 async def create_project(
@@ -80,16 +51,17 @@ async def create_project(
     current_admin: dict = Depends(get_current_admin),
 ):
     """
-    Create a new project (Admin only)
+    ایجاد پروژه جدید (فقط ادمین)
     """
     logger.info(f"current_admin: {current_admin}")
 
-    # Check if slug already exists
-    existing = project_crud.get_by_slug(db, project_in.slug)
-    if existing:
-        raise ConflictException(
-            detail=f"Project with slug '{project_in.slug}' already exists"
-        )
+    # بررسی وجود اسلاگ (اگر ارسال شده باشد)
+    if project_in.slug:
+        existing = project_crud.get_by_slug(db, project_in.slug)
+        if existing:
+            raise ConflictException(
+                detail=f"Project with slug '{project_in.slug}' already exists"
+            )
 
     project = project_crud.create(db, obj_in=project_in)
     logger.info(f"Project created by admin {current_admin['username']}: {project.title}")
@@ -108,13 +80,13 @@ async def update_project(
     current_admin: dict = Depends(get_current_admin),
 ):
     """
-    Update an existing project (Admin only)
+    به‌روزرسانی پروژه (فقط ادمین)
     """
     project = project_crud.get(db, project_id)
     if not project:
         raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
 
-    # Check if slug is being changed and already exists
+    # بررسی وجود اسلاگ (اگر تغییر کرده باشد)
     if project_in.slug and project_in.slug != project.slug:
         existing = project_crud.get_by_slug(db, project_in.slug)
         if existing:
@@ -138,13 +110,13 @@ async def delete_project(
     current_admin: dict = Depends(get_current_admin),
 ):
     """
-    Delete a project and its associated images (Admin only)
+    حذف پروژه و تصاویر مرتبط (فقط ادمین)
     """
     project = project_crud.get(db, project_id)
     if not project:
         raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
 
-    # Delete associated images
+    # حذف تصاویر مرتبط
     if project.cover_image:
         delete_file(project.cover_image)
     if project.gallery_images:
@@ -152,7 +124,7 @@ async def delete_project(
             if img.strip():
                 delete_file(img.strip())
 
-    # Delete project from database
+    # حذف پروژه از دیتابیس
     project_crud.delete(db, project_id=project_id)
     logger.info(f"Project deleted by admin {current_admin['username']}: {project.title}")
 
@@ -169,7 +141,7 @@ async def upload_cover_image(
     current_admin: dict = Depends(get_current_admin),
 ):
     """
-    Upload a cover image for a project (Admin only)
+    آپلود تصویر کاور (فقط ادمین)
     """
     ensure_upload_dirs()
     file_path = await save_upload_file(file, subdirectory="projects/covers")
@@ -186,8 +158,15 @@ async def upload_gallery_images(
     current_admin: dict = Depends(get_current_admin),
 ):
     """
-    Upload multiple gallery images (Admin only)
+    آپلود چند تصویر گالری (فقط ادمین)
     """
+    # ✅ بررسی محدودیت تعداد
+    if len(files) > MAX_GALLERY_IMAGES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"حداکثر {MAX_GALLERY_IMAGES} تصویر می‌توانید آپلود کنید."
+        )
+    
     ensure_upload_dirs()
     saved_paths = []
     
@@ -211,24 +190,24 @@ async def upload_cover_to_project(
     current_admin: dict = Depends(get_current_admin),
 ):
     """
-    Upload a cover image and attach it to a project (Admin only)
+    آپلود تصویر کاور و اتصال به پروژه (فقط ادمین)
     """
     project = project_crud.get(db, project_id)
     if not project:
         raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
 
-    # Delete old cover if exists
+    # حذف کاور قدیمی در صورت وجود
     if project.cover_image:
         delete_file(project.cover_image)
 
-    # Upload new cover
+    # آپلود کاور جدید
     file_path = await save_upload_file(
         file,
         subdirectory="projects/covers",
         custom_filename=f"{project.slug}_cover"
     )
 
-    # Update project
+    # به‌روزرسانی پروژه
     project.cover_image = file_path
     db.add(project)
     db.commit()
@@ -248,13 +227,24 @@ async def upload_gallery_to_project(
     current_admin: dict = Depends(get_current_admin),
 ):
     """
-    Upload gallery images and attach them to a project (Admin only)
+    آپلود تصاویر گالری و اتصال به پروژه (فقط ادمین)
     """
     project = project_crud.get(db, project_id)
     if not project:
         raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
 
-    # Upload new gallery images
+    # ✅ بررسی محدودیت تعداد
+    existing_images = []
+    if project.gallery_images:
+        existing_images = [img.strip() for img in project.gallery_images.split(",") if img.strip()]
+    
+    if len(existing_images) + len(files) > MAX_GALLERY_IMAGES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"حداکثر {MAX_GALLERY_IMAGES} تصویر مجاز است. در حال حاضر {len(existing_images)} تصویر وجود دارد."
+        )
+
+    # آپلود تصاویر جدید
     saved_paths = []
     for file in files:
         if file.filename:
@@ -265,12 +255,8 @@ async def upload_gallery_to_project(
             )
             saved_paths.append(path)
 
-    # Append to existing gallery
-    existing = []
-    if project.gallery_images:
-        existing = [img.strip() for img in project.gallery_images.split(",") if img.strip()]
-    
-    all_images = existing + saved_paths
+    # اضافه کردن به گالری موجود
+    all_images = existing_images + saved_paths
     project.gallery_images = ",".join(all_images)
 
     db.add(project)
@@ -282,4 +268,3 @@ async def upload_gallery_to_project(
         "count": len(saved_paths),
         "message": f"{len(saved_paths)} images uploaded and attached to project"
     }
-
