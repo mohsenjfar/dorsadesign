@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { 
-  FiSave, FiX, FiPlus, FiTrash2, FiRefreshCw, 
+  FiSave, FiX, FiPlus, FiTrash2, 
   FiImage, FiLoader, FiArrowLeft 
 } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
@@ -19,20 +19,18 @@ const EditProject = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false)
   const [uploadingCover, setUploadingCover] = useState(false)
   const [uploadingGallery, setUploadingGallery] = useState(false)
   
   const MAX_GALLERY_IMAGES = 3
   
   // ============================================
-  // State فرم (فقط فارسی)
+  // State فرم (فقط فارسی - بدون اسلاگ)
   // ============================================
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     full_description: '',
-    slug: '',
     project_type: 'residential',
     client_name: '',
     year: '',
@@ -61,7 +59,6 @@ const EditProject = () => {
           title: data.title?.fa || data.title || '',
           description: data.description?.fa || data.description || '',
           full_description: data.full_description?.fa || data.full_description || '',
-          slug: data.slug || '',
           project_type: data.project_type || 'residential',
           client_name: data.client_name || '',
           year: data.year || '',
@@ -88,42 +85,14 @@ const EditProject = () => {
   }, [id])
 
   // ============================================
-  // تابع تولید اسلاگ
-  // ============================================
-  const generateSlug = (title) => {
-    if (!title) return ''
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-  }
-
-  useEffect(() => {
-    if (!slugManuallyEdited && formData.title) {
-      const newSlug = generateSlug(formData.title)
-      setFormData(prev => ({ ...prev, slug: newSlug }))
-    }
-  }, [formData.title, slugManuallyEdited])
-
-  // ============================================
   // مدیریت فیلدها
   // ============================================
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    if (name === 'slug') {
-      setSlugManuallyEdited(true)
-    }
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
-  }
-
-  const resetSlug = () => {
-    const newSlug = generateSlug(formData.title)
-    setFormData(prev => ({ ...prev, slug: newSlug }))
-    setSlugManuallyEdited(false)
   }
 
   // ============================================
@@ -256,7 +225,7 @@ const EditProject = () => {
   }
 
   // ============================================
-  // ارسال فرم (ویرایش)
+  // ارسال فرم (ویرایش - بدون اسلاگ)
   // ============================================
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -264,8 +233,6 @@ const EditProject = () => {
     setSaving(true)
 
     try {
-      const finalSlug = formData.slug || generateSlug(formData.title)
-
       if (!formData.title.trim()) {
         throw new Error('عنوان پروژه الزامی است')
       }
@@ -274,7 +241,6 @@ const EditProject = () => {
         title: {
           fa: formData.title
         },
-        slug: finalSlug,
         description: {
           fa: formData.description
         },
@@ -577,33 +543,6 @@ const EditProject = () => {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                شناسه یکتا (اسلاگ) *
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="slug"
-                  value={formData.slug}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition pl-10"
-                  placeholder="auto-generated"
-                  dir="ltr"
-                />
-                <button
-                  type="button"
-                  onClick={resetSlug}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary-600 transition"
-                >
-                  <FiRefreshCw className="w-4 h-4" />
-                </button>
-              </div>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                به صورت خودکار از عنوان تولید می‌شود. در صورت نیاز دستی ویرایش کنید.
-              </p>
-            </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 نوع پروژه
