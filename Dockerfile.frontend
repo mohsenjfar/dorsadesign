@@ -2,12 +2,15 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ARG NPM_REGISTRY
+ARG VITE_API_URL
+
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm config set registry ${NPM_REGISTRY:-https://registry.npmjs.org} \
+    && npm ci --legacy-peer-deps
 
 COPY frontend/ ./
 
-ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL:-/api}
 RUN npm run build
 
