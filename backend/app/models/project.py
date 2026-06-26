@@ -29,7 +29,6 @@ class Project(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     
     title = Column(String(255), nullable=False, comment="عنوان پروژه")
-    slug = Column(String(255), unique=True, nullable=False, index=True, comment="شناسه یکتا")
     description = Column(Text, nullable=True, comment="توضیحات کوتاه")
     full_description = Column(Text, nullable=True, comment="توضیحات کامل")
     features = Column(Text, nullable=True, comment="ویژگی‌ها (جداسازی با کاما)")
