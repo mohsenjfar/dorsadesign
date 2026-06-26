@@ -1,11 +1,8 @@
 // frontend/src/services/api.js
 import axios from 'axios'
 
-// ============================================
-// ✅ تنظیم baseURL با لاگ برای دیباگ
-// ============================================
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-console.log('🔵 API Base URL:', API_BASE_URL)  // ← برای دیباگ
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -14,30 +11,18 @@ const api = axios.create({
   },
 })
 
-// ============================================
-// ✅ Interceptor برای ارسال زبان و توکن
-// ============================================
 api.interceptors.request.use(
   (config) => {
-    // اضافه کردن زبان
     const language = localStorage.getItem('i18nextLng') || 'fa'
     config.params = {
       ...config.params,
       language: language,
     }
 
-    // ✅ اضافه کردن توکن به هدر
     const token = localStorage.getItem('access_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-
-    console.log('📤 API Request:', {
-      method: config.method?.toUpperCase(),
-      url: `${config.baseURL}${config.url}`,
-      params: config.params,
-      headers: config.headers,
-    })  // ← برای دیباگ
 
     return config
   },
@@ -47,9 +32,6 @@ api.interceptors.request.use(
   }
 )
 
-// ============================================
-// ✅ Interceptor برای مدیریت خطاهای 401
-// ============================================
 api.interceptors.response.use(
   (response) => {
     console.log('✅ API Response:', {
@@ -114,7 +96,7 @@ api.interceptors.response.use(
 
 export const getProjects = async (params = {}) => {
   try {
-    const response = await api.get('/api/projects', { params: params })
+    const response = await api.get('/api/projects/', { params })
     return response.data
   } catch (error) {
     console.error('❌ Error fetching projects:', error)
