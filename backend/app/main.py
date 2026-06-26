@@ -37,6 +37,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.router.redirect_slashes = False
+
 app.include_router(api_router, prefix="/api")
 
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
