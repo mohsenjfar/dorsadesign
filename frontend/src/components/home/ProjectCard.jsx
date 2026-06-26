@@ -100,7 +100,7 @@ const ProjectCard = ({ project, index }) => {
       whileHover={{ y: -8 }}
       className="group bg-white dark:bg-dark-200 rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 h-full flex flex-col"
     >
-      <Link to={`/projects/${slug}`} className="block h-full flex flex-col">
+      <Link to={`/projects/id/${project.id}`} className="block h-full flex flex-col">
         {/* ==========================================
             Image Section
             ========================================== */}

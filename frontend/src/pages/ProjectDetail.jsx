@@ -16,10 +16,10 @@ import {
   FiX
 } from 'react-icons/fi'
 import { useTranslation } from 'react-i18next'
-import { getProjectBySlug } from '../services/api'
+import { getProjectById, getProjectBySlug } from '../services/api'
 
 const ProjectDetail = () => {
-  const { slug } = useParams()
+  const { id, slug } = useParams()
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const [project, setProject] = useState(null)
@@ -38,7 +38,19 @@ const ProjectDetail = () => {
       setLoading(true)
       setError(null)
       try {
-        const data = await getProjectBySlug(slug)
+        let data
+        
+        // ✅ اگر id وجود داشت، با id دریافت کن
+        if (id) {
+          data = await getProjectById(id)
+        } 
+        // ✅ اگر slug وجود داشت، با slug دریافت کن (سازگاری با لینک‌های قدیمی)
+        else if (slug) {
+          data = await getProjectBySlug(slug)
+        } else {
+          throw new Error('شناسه پروژه یافت نشد')
+        }
+        
         setProject(data)
         setCurrentImageIndex(0)
       } catch (err) {
@@ -48,7 +60,7 @@ const ProjectDetail = () => {
       }
     }
     fetchProject()
-  }, [slug, i18n.language])
+  }, [id, slug, i18n.language])
 
   // ============================================
   // توابع اسلایدشو

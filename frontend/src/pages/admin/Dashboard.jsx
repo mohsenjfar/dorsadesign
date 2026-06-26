@@ -204,7 +204,7 @@ const Dashboard = () => {
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Link
-                            to={`/projects/${project.slug}`}
+                            to={`/projects/${project.id}`}
                             target="_blank"
                             className="p-2 text-gray-400 hover:text-primary-600 transition"
                             title="مشاهده در سایت"

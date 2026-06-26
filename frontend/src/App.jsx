@@ -33,6 +33,7 @@ function App() {
               <Route path="/" element={<Layout><Home /></Layout>} />
               <Route path="/about" element={<Layout><About /></Layout>} />
               <Route path="/contact" element={<Layout><Contact /></Layout>} />
+              <Route path="/projects/id/:id" element={<Layout><ProjectDetail /></Layout>} />
               <Route path="/projects/:slug" element={<Layout><ProjectDetail /></Layout>} />
               
               {/* ============================================

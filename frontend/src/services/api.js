@@ -137,4 +137,14 @@ export const getProjectTypes = async () => {
   ]
 }
 
+export const getProjectById = async (id) => {
+  try {
+    const response = await api.get(`/api/projects/id/${id}`)
+    return response.data
+  } catch (error) {
+    console.error('Error fetching project details:', error)
+    throw error
+  }
+}
+
 export default api

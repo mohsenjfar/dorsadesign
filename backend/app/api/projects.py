@@ -184,3 +184,44 @@ async def get_project_by_slug(
     project = project_crud.increment_views(db, project=project)
 
     return response
+
+@router.get("/id/{project_id}", response_model=ProjectResponse)
+async def get_project_by_id(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    language: str = Query('fa', description="Language (fa)"),
+):
+    """
+    دریافت پروژه با شناسه (ID)
+    """
+    project = project_crud.get(db, project_id)
+    if not project:
+        raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
+
+    # استخراج ترجمه و ساخت پاسخ
+    response_dict = {
+        "id": project.id,
+        "title": get_translation(project.title, language) if project.title else None,
+        "slug": project.slug,
+        "description": get_translation(project.description, language) if project.description else None,
+        "full_description": get_translation(project.full_description, language) if project.full_description else None,
+        "features": get_translated_list(project.features, language) if project.features else [],
+        "project_type": project.project_type,
+        "client_name": project.client_name,
+        "year": project.year,
+        "area": project.area,
+        "status": project.status,
+        "cover_image": project.cover_image,
+        "gallery_images": project.gallery_images,
+        "is_featured": project.is_featured,
+        "views": project.views,
+        "created_at": project.created_at,
+        "updated_at": project.updated_at,
+    }
+    
+    response = ProjectResponse.model_validate(response_dict)
+
+    # افزایش تعداد بازدید
+    project = project_crud.increment_views(db, project=project)
+
+    return response
