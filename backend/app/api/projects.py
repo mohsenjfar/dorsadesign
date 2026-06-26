@@ -79,7 +79,7 @@ async def get_featured_projects(
 
 
 # ✅ فقط با ID
-@router.get("/{project_id}", response_model=ProjectResponse)
+@router.get("/id/{project_id}", response_model=ProjectResponse)
 async def get_project_by_id(
     project_id: UUID,
     db: Session = Depends(get_db),
