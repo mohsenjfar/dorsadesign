@@ -130,20 +130,20 @@ const ProjectDetail = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto px-4 sm:px-6 lg:px-8 py-12"
+      className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-6xl"
     >
       {/* ===== دکمه بازگشت ===== */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6"
+        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-4"
       >
         <FiArrowLeft className="w-5 h-5" />
         {t('project.back')}
       </button>
 
-      {/* ===== اسلایدشو ===== */}
+      {/* ===== اسلایدشو (ابعاد کوچک‌تر) ===== */}
       {allImages.length > 0 && (
-        <div className="relative rounded-xl overflow-hidden mb-8 bg-gray-100 dark:bg-dark-300 aspect-video">
+        <div className="relative rounded-xl overflow-hidden mb-6 bg-gray-100 dark:bg-dark-300 aspect-[3/2] max-h-[500px]">
           <img
             src={allImages[currentImageIndex]}
             alt={project.title}
@@ -158,28 +158,33 @@ const ProjectDetail = () => {
                 onClick={(e) => { e.stopPropagation(); prevImage(); }}
                 className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
               >
-                <FiChevronLeft className="w-6 h-6" />
+                <FiChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); nextImage(); }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
               >
-                <FiChevronRight className="w-6 h-6" />
+                <FiChevronRight className="w-5 h-5" />
               </button>
               
               {/* نشانگر تعداد تصاویر */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                 {allImages.map((_, index) => (
                   <button
                     key={index}
                     onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(index); }}
-                    className={`w-2 h-2 rounded-full transition-all ${
+                    className={`w-1.5 h-1.5 rounded-full transition-all ${
                       index === currentImageIndex 
-                        ? 'w-6 bg-white' 
+                        ? 'w-4 bg-white' 
                         : 'bg-white/50 hover:bg-white/80'
                     }`}
                   />
                 ))}
+              </div>
+
+              {/* شمارنده تصاویر */}
+              <div className="absolute bottom-3 right-4 px-3 py-1 bg-black/60 text-white text-xs rounded-full">
+                {currentImageIndex + 1} / {allImages.length}
               </div>
             </>
           )}
@@ -187,51 +192,51 @@ const ProjectDetail = () => {
       )}
 
       {/* ===== هدر پروژه ===== */}
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900 dark:text-white">
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-display font-bold text-gray-900 dark:text-white">
           {project.title}
         </h1>
         
-        <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-600 dark:text-gray-400">
           {project.project_type && (
-            <span className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full">
+            <span className="px-2.5 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-xs">
               {typeLabels[project.project_type] || project.project_type}
             </span>
           )}
           {project.year && (
             <span className="flex items-center gap-1">
-              <FiCalendar className="w-4 h-4" />
+              <FiCalendar className="w-3.5 h-3.5" />
               {project.year}
             </span>
           )}
           {project.area && (
             <span className="flex items-center gap-1">
-              <FiMaximize className="w-4 h-4" />
+              <FiMaximize className="w-3.5 h-3.5" />
               {project.area} {t('project.square_meters')}
             </span>
           )}
           {project.client_name && (
             <span className="flex items-center gap-1">
-              <FiUser className="w-4 h-4" />
+              <FiUser className="w-3.5 h-3.5" />
               {project.client_name}
             </span>
           )}
           <span className="flex items-center gap-1">
-            <FiEye className="w-4 h-4" />
+            <FiEye className="w-3.5 h-3.5" />
             {project.views || 0} {t('project.views')}
           </span>
         </div>
       </div>
 
       {/* ===== توضیحات ===== */}
-      <div className="prose dark:prose-invert max-w-none mb-8">
+      <div className="prose dark:prose-invert max-w-none mb-6">
         {project.description && (
-          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
             {project.description}
           </p>
         )}
         {project.full_description && (
-          <div className="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
+          <div className="mt-3 text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line text-sm">
             {project.full_description}
           </div>
         )}
@@ -239,18 +244,18 @@ const ProjectDetail = () => {
 
       {/* ===== Features ===== */}
       {project.features && project.features.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-xl font-display font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="mb-6">
+          <h3 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-3">
             {t('project.features')}
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {project.features.map((feature, index) => (
               <div
                 key={index}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-dark-300 rounded-lg"
+                className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-dark-300 rounded-lg text-sm"
               >
-                <FiTag className="w-4 h-4 text-primary-500" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                <FiTag className="w-3.5 h-3.5 text-primary-500" />
+                <span className="text-gray-700 dark:text-gray-300">{feature}</span>
               </div>
             ))}
           </div>
@@ -259,11 +264,11 @@ const ProjectDetail = () => {
 
       {/* ===== گالری تصاویر ===== */}
       {galleryImages.length > 0 && (
-        <div className="mt-12">
-          <h3 className="text-xl font-display font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="mt-8">
+          <h3 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-3">
             {t('project.gallery')}
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {galleryImages.map((img, index) => (
               <motion.div
                 key={index}
@@ -280,7 +285,7 @@ const ProjectDetail = () => {
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
-                  <FiImage className="w-8 h-8 text-white/0 group-hover:text-white/80 transition-all" />
+                  <FiImage className="w-6 h-6 text-white/0 group-hover:text-white/80 transition-all" />
                 </div>
               </motion.div>
             ))}
@@ -311,7 +316,7 @@ const ProjectDetail = () => {
           <img
             src={allImages[currentImageIndex]}
             alt={project.title}
-            className="max-w-[95vw] max-h-[90vh] object-contain"
+            className="max-w-[90vw] max-h-[85vh] object-contain"
             onClick={(e) => e.stopPropagation()}
           />
           
@@ -334,6 +339,11 @@ const ProjectDetail = () => {
                 }`}
               />
             ))}
+          </div>
+
+          {/* شمارنده در Lightbox */}
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-white/60 text-sm z-10">
+            {currentImageIndex + 1} / {allImages.length}
           </div>
         </div>
       )}
