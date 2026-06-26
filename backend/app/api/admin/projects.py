@@ -36,7 +36,9 @@ async def get_project_by_id_admin(
     db: Session = Depends(get_db),
     current_admin: dict = Depends(get_current_admin),
 ):
-    """دریافت کامل پروژه با ID"""
+    """
+    دریافت کامل پروژه با ID (فقط ادمین)
+    """
     project = project_crud.get(db, project_id)
     if not project:
         raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
@@ -54,14 +56,6 @@ async def create_project(
     ایجاد پروژه جدید (فقط ادمین)
     """
     logger.info(f"current_admin: {current_admin}")
-
-    # بررسی وجود اسلاگ (اگر ارسال شده باشد)
-    if project_in.slug:
-        existing = project_crud.get_by_slug(db, project_in.slug)
-        if existing:
-            raise ConflictException(
-                detail=f"Project with slug '{project_in.slug}' already exists"
-            )
 
     project = project_crud.create(db, obj_in=project_in)
     logger.info(f"Project created by admin {current_admin['username']}: {project.title}")
@@ -85,14 +79,6 @@ async def update_project(
     project = project_crud.get(db, project_id)
     if not project:
         raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
-
-    # بررسی وجود اسلاگ (اگر تغییر کرده باشد)
-    if project_in.slug and project_in.slug != project.slug:
-        existing = project_crud.get_by_slug(db, project_in.slug)
-        if existing:
-            raise ConflictException(
-                detail=f"Project with slug '{project_in.slug}' already exists"
-            )
 
     project = project_crud.update(db, db_obj=project, obj_in=project_in)
     logger.info(f"Project updated by admin {current_admin['username']}: {project.title}")
@@ -119,6 +105,7 @@ async def delete_project(
     # حذف تصاویر مرتبط
     if project.cover_image:
         delete_file(project.cover_image)
+    
     if project.gallery_images:
         for img in project.gallery_images.split(","):
             if img.strip():
@@ -160,7 +147,7 @@ async def upload_gallery_images(
     """
     آپلود چند تصویر گالری (فقط ادمین)
     """
-    # ✅ بررسی محدودیت تعداد
+    # بررسی محدودیت تعداد
     if len(files) > MAX_GALLERY_IMAGES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -233,7 +220,7 @@ async def upload_gallery_to_project(
     if not project:
         raise NotFoundException(detail=f"Project with ID '{project_id}' not found")
 
-    # ✅ بررسی محدودیت تعداد
+    # بررسی محدودیت تعداد
     existing_images = []
     if project.gallery_images:
         existing_images = [img.strip() for img in project.gallery_images.split(",") if img.strip()]
