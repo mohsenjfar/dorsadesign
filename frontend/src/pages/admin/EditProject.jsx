@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { 
-  FiSave, FiX, FiPlus, FiTrash2, FiUpload, FiRefreshCw, 
+  FiSave, FiX, FiPlus, FiTrash2, FiRefreshCw, 
   FiImage, FiLoader, FiArrowLeft 
 } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
@@ -23,22 +23,15 @@ const EditProject = () => {
   const [uploadingCover, setUploadingCover] = useState(false)
   const [uploadingGallery, setUploadingGallery] = useState(false)
   
-  // ✅ محدودیت تعداد تصاویر گالری
   const MAX_GALLERY_IMAGES = 3
   
   // ============================================
-  // State فرم
+  // State فرم (فقط فارسی)
   // ============================================
   const [formData, setFormData] = useState({
-    // فارسی
-    title_fa: '',
-    description_fa: '',
-    full_description_fa: '',
-    // انگلیسی
-    title_en: '',
-    description_en: '',
-    full_description_en: '',
-    // مشترک
+    title: '',
+    description: '',
+    full_description: '',
     slug: '',
     project_type: 'residential',
     client_name: '',
@@ -46,7 +39,7 @@ const EditProject = () => {
     area: '',
     status: 'draft',
     is_featured: false,
-    features: { en: [], fa: [] },
+    features: [],
     cover_image: null,
     cover_file: null,
     gallery_images: [],
@@ -64,19 +57,10 @@ const EditProject = () => {
         const response = await api.get(`/api/admin/projects/by-id/${id}`)
         const data = response.data
 
-        console.log(data)
-        
-        // استخراج صحیح داده‌های فارسی و انگلیسی از JSON
         setFormData({
-          // فارسی
-          title_fa: data.title?.fa || data.title_fa || '',
-          description_fa: data.description?.fa || data.description_fa || '',
-          full_description_fa: data.full_description?.fa || data.full_description_fa || '',
-          // انگلیسی
-          title_en: data.title?.en || data.title_en || data.title || '',
-          description_en: data.description?.en || data.description_en || data.description || '',
-          full_description_en: data.full_description?.en || data.full_description_en || data.full_description || '',
-          // مشترک
+          title: data.title?.fa || data.title || '',
+          description: data.description?.fa || data.description || '',
+          full_description: data.full_description?.fa || data.full_description || '',
           slug: data.slug || '',
           project_type: data.project_type || 'residential',
           client_name: data.client_name || '',
@@ -84,10 +68,7 @@ const EditProject = () => {
           area: data.area || '',
           status: data.status || 'draft',
           is_featured: data.is_featured || false,
-          features: {
-            en: data.features?.en || data.features || [],
-            fa: data.features?.fa || [],
-          },
+          features: data.features?.fa || data.features || [],
           cover_image: data.cover_image || null,
           cover_file: null,
           gallery_images: data.gallery_images ? data.gallery_images.split(',').filter(Boolean) : [],
@@ -119,11 +100,11 @@ const EditProject = () => {
   }
 
   useEffect(() => {
-    if (!slugManuallyEdited && formData.title_en) {
-      const newSlug = generateSlug(formData.title_en)
+    if (!slugManuallyEdited && formData.title) {
+      const newSlug = generateSlug(formData.title)
       setFormData(prev => ({ ...prev, slug: newSlug }))
     }
-  }, [formData.title_en, slugManuallyEdited])
+  }, [formData.title, slugManuallyEdited])
 
   // ============================================
   // مدیریت فیلدها
@@ -140,7 +121,7 @@ const EditProject = () => {
   }
 
   const resetSlug = () => {
-    const newSlug = generateSlug(formData.title_en)
+    const newSlug = generateSlug(formData.title)
     setFormData(prev => ({ ...prev, slug: newSlug }))
     setSlugManuallyEdited(false)
   }
@@ -148,31 +129,25 @@ const EditProject = () => {
   // ============================================
   // مدیریت ویژگی‌ها
   // ============================================
-  const handleFeatureChange = (lang, index, value) => {
+  const handleFeatureChange = (index, value) => {
     setFormData(prev => {
-      const newFeatures = { ...prev.features }
-      newFeatures[lang][index] = value
+      const newFeatures = [...prev.features]
+      newFeatures[index] = value
       return { ...prev, features: newFeatures }
     })
   }
 
-  const addFeature = (lang) => {
+  const addFeature = () => {
     setFormData(prev => ({
       ...prev,
-      features: {
-        ...prev.features,
-        [lang]: [...prev.features[lang], '']
-      }
+      features: [...prev.features, '']
     }))
   }
 
-  const removeFeature = (lang, index) => {
+  const removeFeature = (index) => {
     setFormData(prev => ({
       ...prev,
-      features: {
-        ...prev.features,
-        [lang]: prev.features[lang].filter((_, i) => i !== index)
-      }
+      features: prev.features.filter((_, i) => i !== index)
     }))
   }
 
@@ -247,7 +222,6 @@ const EditProject = () => {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
-    // ✅ بررسی محدودیت تعداد
     const currentCount = formData.gallery_images.length
     const remainingSlots = MAX_GALLERY_IMAGES - currentCount
     
@@ -290,32 +264,25 @@ const EditProject = () => {
     setSaving(true)
 
     try {
-      const finalSlug = formData.slug || generateSlug(formData.title_en)
+      const finalSlug = formData.slug || generateSlug(formData.title)
 
-        if (!formData.title_en.trim()) {
-        throw new Error('عنوان انگلیسی الزامی است')
-        }
-        if (!formData.title_fa.trim()) {
-        throw new Error('عنوان فارسی الزامی است')
-        }
+      if (!formData.title.trim()) {
+        throw new Error('عنوان پروژه الزامی است')
+      }
 
       const projectData = {
         title: {
-          en: formData.title_en,
-          fa: formData.title_fa
+          fa: formData.title
         },
         slug: finalSlug,
         description: {
-          en: formData.description_en,
-          fa: formData.description_fa
+          fa: formData.description
         },
         full_description: {
-          en: formData.full_description_en,
-          fa: formData.full_description_fa
+          fa: formData.full_description
         },
         features: {
-          en: formData.features.en.filter(f => f.trim()),
-          fa: formData.features.fa.filter(f => f.trim())
+          fa: formData.features.filter(f => f.trim())
         },
         project_type: formData.project_type,
         client_name: formData.client_name,
@@ -345,7 +312,7 @@ const EditProject = () => {
       {/* Cover Image */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {t('admin.project.cover_image')}
+          تصویر کاور
         </label>
         <div className="border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-xl p-6 transition hover:border-primary-400 dark:hover:border-primary-500">
           {uploadingCover ? (
@@ -372,10 +339,10 @@ const EditProject = () => {
             <div className="text-center py-8">
               <FiImage className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-400">
-                {t('admin.project.click_to_upload_cover')}
+                برای آپلود تصویر کاور کلیک کنید
               </p>
               <label className="mt-4 inline-block px-6 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition">
-                {t('admin.project.choose_cover')}
+                انتخاب کاور
                 <input
                   type="file"
                   accept="image/*"
@@ -391,8 +358,8 @@ const EditProject = () => {
       {/* Gallery Images */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {t('admin.project.gallery_images')}
-          <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+          تصاویر گالری
+          <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">
             ({formData.gallery_images.length}/{MAX_GALLERY_IMAGES})
           </span>
         </label>
@@ -438,10 +405,10 @@ const EditProject = () => {
             <div className="text-center py-8">
               <FiImage className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-400">
-                {t('admin.project.click_to_upload_gallery')}
+                برای آپلود تصاویر گالری کلیک کنید
               </p>
               <label className="mt-4 inline-block px-6 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition">
-                {t('admin.project.choose_gallery')}
+                انتخاب گالری
                 <input
                   type="file"
                   accept="image/*"
@@ -478,7 +445,7 @@ const EditProject = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="container mx-auto px-4 py-8 max-w-7xl"
+      className="container mx-auto px-4 py-8 max-w-4xl"
     >
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
@@ -490,7 +457,7 @@ const EditProject = () => {
             <FiArrowLeft className="w-6 h-6" />
           </button>
           <h1 className="text-2xl font-display font-bold text-gray-900 dark:text-white">
-            {t('admin.project.edit_title')}
+            ویرایش پروژه
           </h1>
         </div>
         <button
@@ -498,7 +465,7 @@ const EditProject = () => {
           className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
         >
           <FiX className="w-5 h-5" />
-          {t('admin.project.cancel')}
+          انصراف
         </button>
       </div>
 
@@ -511,190 +478,108 @@ const EditProject = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* ===== دو ستون فارسی و انگلیسی ===== */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* فارسی */}
-          <div className="bg-white dark:bg-dark-200 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-dark-300">
-            <h2 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <span className="text-primary-600">🇮🇷</span>
-              {t('admin.project.persian_section')}
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('admin.project.title')} *
-                </label>
-                <input
-                  type="text"
-                  name="title_fa"
-                  value={formData.title_fa}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                  required
-                  dir="rtl"
-                  placeholder="عنوان پروژه به فارسی"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('admin.project.description')}
-                </label>
-                <textarea
-                  name="description_fa"
-                  value={formData.description_fa}
-                  onChange={handleChange}
-                  rows="2"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                  dir="rtl"
-                  placeholder="توضیحات کوتاه به فارسی"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('admin.project.full_description')}
-                </label>
-                <textarea
-                  name="full_description_fa"
-                  value={formData.full_description_fa}
-                  onChange={handleChange}
-                  rows="4"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                  dir="rtl"
-                  placeholder="توضیحات کامل به فارسی"
-                />
-              </div>
-              {/* ویژگی‌های فارسی */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('admin.project.features')}
-                </label>
-                <div className="space-y-2">
-                  {formData.features.fa.map((feature, index) => (
-                    <div key={index} className="flex gap-2">
-                      <input
-                        type="text"
-                        value={feature}
-                        onChange={(e) => handleFeatureChange('fa', index, e.target.value)}
-                        className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                        dir="rtl"
-                        placeholder="یک ویژگی وارد کنید..."
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeFeature('fa', index)}
-                        className="p-2 text-red-500 hover:text-red-700 transition"
-                      >
-                        <FiTrash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => addFeature('fa')}
-                    className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition text-sm"
-                  >
-                    <FiPlus className="w-4 h-4" />
-                    {t('admin.project.add_feature')}
-                  </button>
-                </div>
-              </div>
+        {/* ===== بخش اطلاعات پروژه (فقط فارسی) ===== */}
+        <div className="bg-white dark:bg-dark-200 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-dark-300">
+          <h2 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span className="text-primary-600">🇮🇷</span>
+            اطلاعات پروژه
+          </h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                عنوان پروژه *
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
+                required
+                dir="rtl"
+                placeholder="عنوان پروژه را وارد کنید"
+              />
             </div>
-          </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                توضیحات کوتاه
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="2"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
+                dir="rtl"
+                placeholder="توضیحات کوتاه پروژه"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                توضیحات کامل
+              </label>
+              <textarea
+                name="full_description"
+                value={formData.full_description}
+                onChange={handleChange}
+                rows="4"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
+                dir="rtl"
+                placeholder="توضیحات کامل پروژه"
+              />
+            </div>
 
-          {/* انگلیسی */}
-          <div className="bg-white dark:bg-dark-200 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-dark-300">
-            <h2 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <span className="text-primary-600">🇬🇧</span>
-              {t('admin.project.english_section')}
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('admin.project.title')} *
-                </label>
-                <input
-                  type="text"
-                  name="title_en"
-                  value={formData.title_en}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                  required
-                  placeholder="Project title in English"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('admin.project.description')}
-                </label>
-                <textarea
-                  name="description_en"
-                  value={formData.description_en}
-                  onChange={handleChange}
-                  rows="2"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                  placeholder="Short description in English"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('admin.project.full_description')}
-                </label>
-                <textarea
-                  name="full_description_en"
-                  value={formData.full_description_en}
-                  onChange={handleChange}
-                  rows="4"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                  placeholder="Full description in English"
-                />
-              </div>
-              {/* ویژگی‌های انگلیسی */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('admin.project.features')}
-                </label>
-                <div className="space-y-2">
-                  {formData.features.en.map((feature, index) => (
-                    <div key={index} className="flex gap-2">
-                      <input
-                        type="text"
-                        value={feature}
-                        onChange={(e) => handleFeatureChange('en', index, e.target.value)}
-                        className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                        placeholder="Enter a feature..."
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeFeature('en', index)}
-                        className="p-2 text-red-500 hover:text-red-700 transition"
-                      >
-                        <FiTrash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => addFeature('en')}
-                    className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition text-sm"
-                  >
-                    <FiPlus className="w-4 h-4" />
-                    {t('admin.project.add_feature')}
-                  </button>
-                </div>
+            {/* ویژگی‌ها */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                ویژگی‌ها
+              </label>
+              <div className="space-y-2">
+                {formData.features.map((feature, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={feature}
+                      onChange={(e) => handleFeatureChange(index, e.target.value)}
+                      className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
+                      dir="rtl"
+                      placeholder="یک ویژگی وارد کنید..."
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeFeature(index)}
+                      className="p-2 text-red-500 hover:text-red-700 transition"
+                    >
+                      <FiTrash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addFeature}
+                  className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition text-sm"
+                >
+                  <FiPlus className="w-4 h-4" />
+                  افزودن ویژگی
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* ===== اطلاعات عمومی ===== */}
+        {/* ===== بخش اطلاعات عمومی ===== */}
         <div className="bg-white dark:bg-dark-200 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-dark-300">
           <h2 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-4">
-            {t('admin.project.general_info')}
+            اطلاعات عمومی
           </h2>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.project.slug')} *
+                شناسه یکتا (اسلاگ) *
               </label>
               <div className="relative">
                 <input
@@ -702,24 +587,26 @@ const EditProject = () => {
                   name="slug"
                   value={formData.slug}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition pr-10"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition pl-10"
                   placeholder="auto-generated"
+                  dir="ltr"
                 />
                 <button
                   type="button"
                   onClick={resetSlug}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary-600 transition"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary-600 transition"
                 >
                   <FiRefreshCw className="w-4 h-4" />
                 </button>
               </div>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                {t('admin.project.slug_hint')}
+                به صورت خودکار از عنوان تولید می‌شود. در صورت نیاز دستی ویرایش کنید.
               </p>
             </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.project.type')}
+                نوع پروژه
               </label>
               <select
                 name="project_type"
@@ -727,18 +614,19 @@ const EditProject = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
               >
-                <option value="residential">{t('projects.filter_residential')}</option>
-                <option value="commercial">{t('projects.filter_commercial')}</option>
-                <option value="office">{t('projects.filter_office')}</option>
-                <option value="villa">{t('projects.filter_villa')}</option>
-                <option value="cultural">{t('projects.filter_cultural')}</option>
-                <option value="educational">{t('projects.filter_educational')}</option>
-                <option value="other">{t('projects.filter_other')}</option>
+                <option value="residential">مسکونی</option>
+                <option value="commercial">تجاری</option>
+                <option value="office">اداری</option>
+                <option value="villa">ویلایی</option>
+                <option value="cultural">فرهنگی</option>
+                <option value="educational">آموزشی</option>
+                <option value="other">سایر</option>
               </select>
             </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.project.client')}
+                نام کارفرما
               </label>
               <input
                 type="text"
@@ -746,11 +634,14 @@ const EditProject = () => {
                 value={formData.client_name}
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
+                dir="rtl"
+                placeholder="نام کارفرما"
               />
             </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.project.year')}
+                سال اجرا
               </label>
               <input
                 type="text"
@@ -758,12 +649,14 @@ const EditProject = () => {
                 value={formData.year}
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                placeholder="1404"
+                placeholder="۱۴۰۴"
+                dir="ltr"
               />
             </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.project.area')}
+                مساحت (متر مربع)
               </label>
               <input
                 type="text"
@@ -771,12 +664,14 @@ const EditProject = () => {
                 value={formData.area}
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
-                placeholder="1200"
+                placeholder="۱۲۰۰"
+                dir="ltr"
               />
             </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.project.status')}
+                وضعیت
               </label>
               <select
                 name="status"
@@ -784,12 +679,13 @@ const EditProject = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition"
               >
-                <option value="draft">{t('admin.project.draft')}</option>
-                <option value="published">{t('admin.project.published')}</option>
-                <option value="archived">{t('admin.project.archived')}</option>
+                <option value="draft">پیش‌نویس</option>
+                <option value="published">منتشر شده</option>
+                <option value="archived">بایگانی شده</option>
               </select>
             </div>
           </div>
+          
           <div className="mt-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -800,16 +696,16 @@ const EditProject = () => {
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                {t('admin.project.featured')}
+                پروژه ویژه
               </span>
             </label>
           </div>
         </div>
 
-        {/* ===== تصاویر ===== */}
+        {/* ===== بخش تصاویر ===== */}
         <div className="bg-white dark:bg-dark-200 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-dark-300">
           <h2 className="text-lg font-display font-semibold text-gray-900 dark:text-white mb-4">
-            {t('admin.project.images')}
+            تصاویر پروژه
           </h2>
           {renderImageSection()}
         </div>
@@ -821,7 +717,7 @@ const EditProject = () => {
             onClick={() => navigate('/admin/dashboard')}
             className="px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
           >
-            {t('admin.project.cancel')}
+            انصراف
           </button>
           <button
             type="submit"
@@ -831,12 +727,12 @@ const EditProject = () => {
             {saving ? (
               <>
                 <FiLoader className="w-5 h-5 animate-spin" />
-                {t('admin.project.saving')}
+                در حال ذخیره...
               </>
             ) : (
               <>
                 <FiSave className="w-5 h-5" />
-                {t('admin.project.update')}
+                به‌روزرسانی پروژه
               </>
             )}
           </button>
