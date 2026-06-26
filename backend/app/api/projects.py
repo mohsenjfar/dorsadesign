@@ -45,13 +45,11 @@ async def get_projects(
         language=language,
     )
 
-    # ✅ استفاده مستقیم از مدل
     items = [
         ProjectListResponse.model_validate(p)
         for p in projects
     ]
 
-    # محاسبه تعداد صفحات
     pages = (total + limit - 1) // limit if total > 0 else 0
 
     return ProjectList(
@@ -72,7 +70,6 @@ async def get_featured_projects(
     """دریافت پروژه‌های ویژه"""
     projects = project_crud.get_featured(db, limit=limit)
     
-    # ✅ استفاده مستقیم از مدل
     items = [
         ProjectListResponse.model_validate(p)
         for p in projects
@@ -81,27 +78,8 @@ async def get_featured_projects(
     return items
 
 
-@router.get("/{slug}", response_model=ProjectResponse)
-async def get_project_by_slug(
-    slug: str,
-    db: Session = Depends(get_db),
-    language: str = Query('fa', description="Language"),
-):
-    """
-    دریافت پروژه با اسلاگ
-    """
-    project = project_crud.get_by_slug(db, slug=slug)
-    if not project:
-        raise NotFoundException(detail=f"Project with slug '{slug}' not found")
-
-    # افزایش تعداد بازدید
-    project = project_crud.increment_views(db, project=project)
-
-    # ✅ استفاده مستقیم از مدل
-    return ProjectResponse.model_validate(project)
-
-
-@router.get("/id/{project_id}", response_model=ProjectResponse)
+# ✅ فقط با ID
+@router.get("/{project_id}", response_model=ProjectResponse)
 async def get_project_by_id(
     project_id: UUID,
     db: Session = Depends(get_db),
@@ -117,5 +95,4 @@ async def get_project_by_id(
     # افزایش تعداد بازدید
     project = project_crud.increment_views(db, project=project)
 
-    # ✅ استفاده مستقیم از مدل
     return ProjectResponse.model_validate(project)

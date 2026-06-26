@@ -147,7 +147,6 @@ async def upload_gallery_images(
     """
     آپلود چند تصویر گالری (فقط ادمین)
     """
-    # بررسی محدودیت تعداد
     if len(files) > MAX_GALLERY_IMAGES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -191,7 +190,7 @@ async def upload_cover_to_project(
     file_path = await save_upload_file(
         file,
         subdirectory="projects/covers",
-        custom_filename=f"{project.slug}_cover"
+        custom_filename=f"cover_{project.id}_{uuid.uuid4().hex[:8]}"
     )
 
     # به‌روزرسانی پروژه
@@ -238,7 +237,7 @@ async def upload_gallery_to_project(
             path = await save_upload_file(
                 file,
                 subdirectory="projects/galleries",
-                custom_filename=f"{project.slug}_gallery_{uuid.uuid4().hex[:8]}"
+                custom_filename=f"gallery_{project.id}_{uuid.uuid4().hex[:8]}"
             )
             saved_paths.append(path)
 
