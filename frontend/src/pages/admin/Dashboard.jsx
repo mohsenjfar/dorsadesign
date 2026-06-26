@@ -32,7 +32,7 @@ const Dashboard = () => {
       setError(null)
       try {
         const language = i18n.language || 'en'
-        const response = await api.get('/api/projects', {
+        const response = await api.get('/api/projects/', {
           params: { 
             language,
             limit: 100  // دریافت همه پروژه‌ها
