@@ -18,6 +18,9 @@ const CreateProject = () => {
   const [uploadingCover, setUploadingCover] = useState(false)
   const [uploadingGallery, setUploadingGallery] = useState(false)
   
+  // ✅ محدودیت تعداد تصاویر گالری
+  const MAX_GALLERY_IMAGES = 3
+  
   // ============================================
   // State فرم
   // ============================================
@@ -168,7 +171,7 @@ const CreateProject = () => {
   }
 
   // ============================================
-  // ✅ آپلود تصاویر گالری
+  // ✅ آپلود تصاویر گالری با محدودیت
   // ============================================
   const uploadGalleryImages = async (files) => {
     const formData = new FormData()
@@ -193,6 +196,16 @@ const CreateProject = () => {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
+    // ✅ بررسی محدودیت تعداد
+    const currentCount = formData.gallery_images.length
+    const remainingSlots = MAX_GALLERY_IMAGES - currentCount
+    
+    if (files.length > remainingSlots) {
+      setError(`حداکثر ${MAX_GALLERY_IMAGES} تصویر می‌توانید آپلود کنید. ${remainingSlots} جای خالی دارید.`)
+      e.target.value = ''
+      return
+    }
+
     setUploadingGallery(true)
     setError('')
 
@@ -206,6 +219,7 @@ const CreateProject = () => {
       setError(err.message)
     } finally {
       setUploadingGallery(false)
+      e.target.value = ''
     }
   }
 
@@ -319,6 +333,9 @@ const CreateProject = () => {
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('admin.project.gallery_images')}
+          <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+            ({formData.gallery_images.length}/{MAX_GALLERY_IMAGES})
+          </span>
         </label>
         <div className="border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-xl p-6 transition hover:border-primary-400 dark:hover:border-primary-500">
           {uploadingGallery ? (
@@ -344,17 +361,19 @@ const CreateProject = () => {
                   </button>
                 </div>
               ))}
-              <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-lg cursor-pointer hover:border-primary-400 transition">
-                <FiPlus className="w-8 h-8 text-gray-400" />
-                <span className="text-xs text-gray-500 mt-1">افزودن</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleGalleryUpload}
-                  className="hidden"
-                />
-              </label>
+              {formData.gallery_images.length < MAX_GALLERY_IMAGES && (
+                <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-lg cursor-pointer hover:border-primary-400 transition">
+                  <FiPlus className="w-8 h-8 text-gray-400" />
+                  <span className="text-xs text-gray-500 mt-1">افزودن</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleGalleryUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
             </div>
           ) : (
             <div className="text-center py-8">
