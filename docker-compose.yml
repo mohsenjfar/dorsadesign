@@ -42,6 +42,9 @@ services:
       - ALLOWED_EXTENSIONS
       - LOG_LEVEL
       - LOG_FILE
+      - PIP_INDEX_URL
+      - NPM_REGISTRY
+      - VITE_API_URL
     depends_on:
       postgres:
         condition: service_healthy
@@ -54,6 +57,22 @@ services:
     restart: unless-stopped
     networks:
       - external-net
+    environment:
+      - DATABASE_URL
+      - SECRET_KEY
+      - ACCESS_TOKEN_EXPIRE_MINUTES
+      - REFRESH_TOKEN_EXPIRE_DAYS
+      - CORS_ORIGINS
+      - ALLOWED_HOSTS
+      - DEBUG
+      - UPLOAD_DIR
+      - MAX_UPLOAD_SIZE
+      - ALLOWED_EXTENSIONS
+      - LOG_LEVEL
+      - LOG_FILE
+      - PIP_INDEX_URL
+      - NPM_REGISTRY
+      - VITE_API_URL
 
 volumes:
   postgres_data:
