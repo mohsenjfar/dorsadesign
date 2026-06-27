@@ -6,6 +6,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 from dotenv import load_dotenv
+from app.config import settings
 
 # ============================================
 # اضافه کردن مسیر app به sys.path
@@ -36,7 +37,7 @@ from app.models import Project, Admin  # بعداً ایجاد می‌شوند
 config = context.config
 
 # خواندن DATABASE_URL از .env
-database_url = os.getenv("DATABASE_URL")
+database_url = settings.DATABASE_URL
 if database_url:
     config.set_main_option("sqlalchemy.url", database_url)
 

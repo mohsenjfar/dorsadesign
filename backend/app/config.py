@@ -9,7 +9,12 @@ class Settings:
     """Application settings"""
     
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+    USER = os.getenv("POSTGRES_USER")
+    PASSWORD = os.getenv("POSTGRES_PASSWORD")
+    HOST = os.getenv("POSTGRES_HOST")
+    PORT = os.getenv("POSTGRES_PORT")
+    DBNAME = os.getenv("POSTGRES_DB")
+    DATABASE_URL: str = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}"
     
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "change-me-in-production")
