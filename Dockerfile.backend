@@ -2,20 +2,29 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# نصب وابستگی‌ها
 ARG PIP_INDEX_URL
-
 COPY backend/requirements/ ./backend/requirements/
 RUN pip install --no-cache-dir \
     --index-url ${PIP_INDEX_URL:-https://pypi.org/simple} \
     -r backend/requirements/prod.txt
 
+# کپی کد برنامه
 COPY backend/ ./backend/
 
+# کپی و تنظیم فایل entrypoint
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+# تنظیم متغیرهای محیطی
 ENV PYTHONPATH=/app/backend
 ENV UPLOAD_DIR=/app/uploads
 
+# ایجاد دایرکتوری‌های مورد نیاز
 RUN mkdir -p /app/uploads /app/logs
 
+# تنظیم پورت
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# نقطه ورود (Entrypoint) و دستور پیش‌فرض
+ENTRYPOINT ["/docker-entrypoint.sh"]

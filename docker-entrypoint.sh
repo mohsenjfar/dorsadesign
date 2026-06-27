@@ -30,5 +30,4 @@ python seed_admin.py || echo "⚠️ Admin already exists or creation failed"
 # 🐍 اجرای FastAPI
 # ============================================
 echo "🐍 Starting FastAPI backend..."
-cd /app/backend
 exec python -m app.main
