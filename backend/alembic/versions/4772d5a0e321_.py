@@ -101,7 +101,7 @@ def upgrade() -> None:
                existing_comment='Last update timestamp',
                existing_nullable=False,
                existing_server_default=sa.text('now()'))
-    op.drop_index('ix_projects_slug', table_name='projects')
+    op.drop_index('ix_projects_slug', table_name='projects', if_exists=True)
     op.drop_column('projects', 'slug')
     # ### end Alembic commands ###
 
