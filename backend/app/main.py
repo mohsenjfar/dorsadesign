@@ -40,8 +40,16 @@ app.router.redirect_slashes = False
 
 app.include_router(api_router, prefix="/api")
 
-UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
+# ============================================
+# ✅ سرو فایل‌های استاتیک (آپلودها)
+# ============================================
+# ✅ از settings.UPLOAD_DIR استفاده کنید
+UPLOAD_DIR = settings.UPLOAD_DIR
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+logger.info(f"📁 Upload directory: {UPLOAD_DIR}")
+logger.info(f"📁 Exists: {os.path.exists(UPLOAD_DIR)}")
+
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 
