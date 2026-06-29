@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import logging
 import os
@@ -45,29 +44,6 @@ UPLOAD_DIR = os.getenv("UPLOAD_DIR", "./uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
-# ============================================
-# ✅ سرو فایل‌های استاتیک فرانت‌اند
-# ============================================
-FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")
-FRONTEND_DIR = os.path.abspath(FRONTEND_DIR)
-
-if os.path.exists(FRONTEND_DIR):
-    # سرو فایل‌های assets (css, js, images)
-    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="assets")
-
-    @app.get("/{full_path:path}")
-    async def serve_frontend(full_path: str):
-        """سرو صفحات فرانت‌اند (SPA)"""
-        file_path = os.path.join(FRONTEND_DIR, full_path)
-        
-        # اگر فایل وجود داشت، برگردون
-        if os.path.isfile(file_path):
-            return FileResponse(file_path)
-        
-        # در غیر این صورت، index.html رو برگردون (برای SPA)
-        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
-else:
-    logger.warning(f"⚠️ Frontend build not found at: {FRONTEND_DIR}")
 
 # ============================================
 # ✅ Middleware
