@@ -39,7 +39,6 @@ services:
       - CORS_ORIGINS
       - ALLOWED_HOSTS
       - DEBUG
-      - UPLOAD_DIR
       - MAX_UPLOAD_SIZE
       - ALLOWED_EXTENSIONS
       - LOG_LEVEL

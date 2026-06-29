@@ -78,9 +78,7 @@ async def root():
     return {
         "message": "🚀 dorsadesign.ir API",
         "version": "1.0.0",
-        "status": "running",
-        "docs": "/api/docs",
-        "redoc": "/api/redoc"
+        "status": "running"
     }
 
 
