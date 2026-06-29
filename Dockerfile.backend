@@ -16,10 +16,6 @@ COPY backend/ ./backend/
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-# تنظیم متغیرهای محیطی
-ENV PYTHONPATH=/app/backend
-ENV UPLOAD_DIR=/app/uploads
-
 # ایجاد دایرکتوری‌های مورد نیاز
 RUN mkdir -p /app/uploads /app/logs
 
