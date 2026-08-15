@@ -1,0 +1,91 @@
+# backend/alembic/env.py
+
+import os
+import sys
+from logging.config import fileConfig
+from sqlalchemy import engine_from_config, pool
+from alembic import context
+from dotenv import load_dotenv
+from app.config import settings
+
+# ============================================
+# اضافه کردن مسیر app به sys.path
+# ============================================
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+sys.path.insert(0, project_root)
+sys.path.insert(0, os.path.join(project_root, "app"))
+
+# ============================================
+# بارگذاری متغیرهای محیطی از .env
+# ============================================
+
+load_dotenv()
+
+# ============================================
+# وارد کردن Base و مدل‌ها
+# ============================================
+
+from app.database import Base
+from app.models import Project, Admin  # بعداً ایجاد می‌شوند
+
+# ============================================
+# تنظیمات Alembic
+# ============================================
+
+config = context.config
+
+# خواندن DATABASE_URL از .env
+database_url = settings.DATABASE_URL
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url)
+
+# تنظیمات لاگ
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# ============================================
+# متادیتا برای مهاجرت خودکار
+# ============================================
+
+target_metadata = Base.metadata
+
+# ============================================
+# تابع‌های اصلی
+# ============================================
+
+def run_migrations_offline() -> None:
+    """اجرای مهاجرت به صورت آفلاین"""
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+def run_migrations_online() -> None:
+    """اجرای مهاجرت به صورت آنلاین"""
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()

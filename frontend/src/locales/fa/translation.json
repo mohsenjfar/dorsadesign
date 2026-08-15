@@ -1,0 +1,186 @@
+{
+    "nav": {
+    "home": "خانه",
+    "projects": "پروژه‌ها",
+    "about": "درباره ما",
+    "contact": "تماس با ما",
+    "admin_login": "ورود ادمین"
+  },
+  "hero": {
+    "badge": "🏛️ استودیو معماری و طراحی",
+    "title": "dorsadesign",
+    "subtitle": "جایی که چشم‌انداز با معماری روبرو می‌شود",
+    "description": "کاوش در تقاطع فرم، عملکرد و زیبایی از طریق طراحی معماری اندیشمندانه",
+    "cta_projects": "مشاهده پروژه‌ها",
+    "cta_about": "بیشتر بدانید",
+    "scroll": "اسکرول"
+  },
+  "projects": {
+    "title": "پروژه‌های معماری",
+    "subtitle": "نمونه‌کارهای معماری ما را مرور کنید",
+    "filter_all": "همه",
+    "filter_residential": "مسکونی",
+    "filter_commercial": "تجاری",
+    "filter_office": "اداری",
+    "filter_villa": "ویلایی",
+    "filter_cultural": "فرهنگی",
+    "filter_educational": "آموزشی",
+    "filter_other": "سایر",
+    "loading": "در حال بارگذاری...",
+    "no_projects": "هیچ پروژه‌ای یافت نشد",
+    "error": "خطا در بارگذاری پروژه‌ها",
+    "view_details": "مشاهده جزئیات",
+    "featured": "ویژه",
+    "views": "بازدید",
+    "square_meters": "متر مربع"
+  },
+  "footer": {
+    "tagline": "نمونه‌کار معماری و طراحی",
+    "copyright": "تمام حقوق محفوظ است."
+  },
+  "about": {
+    "title": "درباره ما",
+    "story": {
+      "title": "داستان dorsadesign",
+      "paragraph1": "dorsadesign یک استودیوی طراحی معماری است که به خلق فضاهای الهام‌بخش و کاربردی با رویکردی مدرن و خلاقانه می‌پردازد.",
+      "paragraph2": "ما با تیمی از معماران و طراحان حرفه‌ای، پروژه‌هایی را طراحی می‌کنیم که نه تنها زیبا، بلکه پایدار و هماهنگ با محیط زیست هستند."
+    },
+    "vision": {
+      "title": "چشم‌انداز ما",
+      "text": "ایجاد فضاهایی که زندگی را متحول می‌کنند. ما به دنبال ترکیب هنر، علم و تکنولوژی برای خلق معماری‌هایی هستیم که فراتر از زمان باشند."
+    },
+    "stats": {
+      "projects": "پروژه‌های انجام شده",
+      "clients": "مشتریان راضی",
+      "awards": "جوایز طراحی",
+      "experience": "سال‌های تجربه"
+    }
+  },
+  "contact": {
+    "title": "تماس با ما",
+    "subtitle": "با ما در ارتباط باشید",
+    "form": {
+      "title": "ارسال پیام",
+      "name": "نام و نام خانوادگی",
+      "name_required": "نام الزامی است",
+      "name_placeholder": "نام خود را وارد کنید",
+      "email": "ایمیل",
+      "email_required": "ایمیل الزامی است",
+      "email_invalid": "ایمیل معتبر نیست",
+      "email_placeholder": "ایمیل خود را وارد کنید",
+      "subject": "موضوع",
+      "subject_placeholder": "موضوع را وارد کنید",
+      "message": "پیام",
+      "message_required": "پیام الزامی است",
+      "message_placeholder": "پیام خود را بنویسید...",
+      "send": "ارسال پیام",
+      "sending": "در حال ارسال..."
+    },
+    "info": {
+      "title": "اطلاعات تماس",
+      "email": "ایمیل",
+      "phone": "تلفن",
+      "phone_number": "+98",
+      "phone_number_ref": "+98",
+      "address": "آدرس",
+      "address_text": "بستک"
+    },
+    "success": "پیام شما با موفقیت ارسال شد!",
+    "error": "خطا در ارسال پیام. لطفاً دوباره تلاش کنید.",
+    "map": "نقشه"
+  },
+  "project": {
+    "back": "بازگشت",
+    "back_to_home": "بازگشت به صفحه اصلی",
+    "not_found": "پروژه یافت نشد",
+    "error_loading": "خطا در دریافت پروژه",
+    "features": "امکانات",
+    "gallery": "گالری تصاویر",
+    "views": "بازدید",
+    "square_meters": "متر مربع",
+    "related_projects": "پروژه‌های مرتبط"
+  },
+  "admin": {
+    "login": {
+      "title": "ورود به پنل مدیریت",
+      "username": "نام کاربری",
+      "username_placeholder": "نام کاربری خود را وارد کنید",
+      "password": "رمز عبور",
+      "password_placeholder": "رمز عبور خود را وارد کنید",
+      "button": "ورود",
+      "loading": "در حال ورود...",
+      "footer": "منطقه محافظت‌شده - دسترسی فقط برای مدیران"
+    },
+    "dashboard": {
+      "title": "داشبورد مدیریت",
+      "logout": "خروج",
+      "welcome": "خوش آمدید،",
+      "add_project": "افزودن پروژه",
+      "projects_list": "لیست پروژه‌ها در اینجا نمایش داده می‌شود.",
+      "total_projects": "تعداد کل پروژه‌ها",
+      "profile": "پروفایل من"
+    },
+    "profile": {
+      "title": "پروفایل من",
+      "cancel": "انصراف",
+      "save": "ذخیره تغییرات",
+      "saving": "در حال ذخیره...",
+      "basic_info": "اطلاعات پایه",
+      "username": "نام کاربری",
+      "username_readonly": "نام کاربری قابل تغییر نیست",
+      "full_name": "نام کامل",
+      "full_name_placeholder": "نام کامل خود را وارد کنید",
+      "email": "ایمیل",
+      "email_placeholder": "ایمیل خود را وارد کنید",
+      "change_password": "تغییر رمز عبور",
+      "password_hint": "در صورت تمایل به تغییر رمز عبور، فیلدهای زیر را پر کنید",
+      "current_password": "رمز عبور فعلی",
+      "current_password_placeholder": "رمز عبور فعلی را وارد کنید",
+      "new_password": "رمز عبور جدید",
+      "new_password_placeholder": "رمز عبور جدید را وارد کنید (حداقل ۶ کاراکتر)",
+      "confirm_password": "تکرار رمز عبور جدید",
+      "confirm_password_placeholder": "رمز عبور جدید را مجدداً وارد کنید"
+    },
+    "project": {
+      "create_title": "افزودن پروژه جدید",
+      "cancel": "انصراف",
+      "save": "ذخیره پروژه",
+      "saving": "در حال ذخیره...",
+      "persian_section": "بخش فارسی",
+      "english_section": "بخش انگلیسی",
+      "general_info": "اطلاعات عمومی",
+      "title": "عنوان",
+      "description": "توضیحات کوتاه",
+      "full_description": "توضیحات کامل",
+      "slug": "شناسه یکتا (اسلاگ)",
+      "type": "نوع پروژه",
+      "client": "نام کارفرما",
+      "year": "سال اجرا",
+      "area": "مساحت (متر مربع)",
+      "status": "وضعیت",
+      "draft": "پیش‌نویس",
+      "published": "منتشر شده",
+      "archived": "بایگانی شده",
+      "featured": "پروژه ویژه",
+      "features": "امکانات",
+      "add_feature": "افزودن ویژگی",
+      "feature_placeholder": "یک ویژگی وارد کنید...",
+      "images": "تصاویر",
+      "cover_image": "تصویر کاور",
+      "change_image": "تغییر تصویر",
+      "click_to_upload": "برای آپلود کلیک کنید یا بکشید و رها کنید",
+      "supported_formats": "پشتیبانی: JPG، PNG، WebP (حداکثر ۱۰ مگابایت)",
+      "choose_image": "انتخاب تصویر",
+      "views": "بازدید",
+      "actions": "عملیات",
+      "slug_hint": "به صورت خودکار از عنوان انگلیسی تولید می‌شود. در صورت نیاز دستی ویرایش کنید.",
+      "gallery_images": "تصاویر گالری",
+      "click_to_upload_cover": "برای آپلود تصویر کاور کلیک کنید",
+      "click_to_upload_gallery": "برای آپلود تصاویر گالری کلیک کنید",
+      "choose_cover": "انتخاب کاور",
+      "choose_gallery": "انتخاب گالری",
+      "edit_title": "ویرایش پروژه",
+      "update": "به‌روزرسانی پروژه"
+    }
+  }
+}

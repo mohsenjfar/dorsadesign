@@ -1,0 +1,186 @@
+{
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "about": "About",
+    "contact": "Contact",
+    "admin_login": "Admin Login"
+  },
+  "hero": {
+    "badge": "🏛️ Architecture & Design Studio",
+    "title": "dorsadesign",
+    "subtitle": "Where Vision Meets Architecture",
+    "description": "Exploring the intersection of form, function, and beauty through thoughtful architectural design.",
+    "cta_projects": "View Our Projects",
+    "cta_about": "Learn More",
+    "scroll": "Scroll"
+  },
+  "projects": {
+    "title": "Architecture Projects",
+    "subtitle": "Browse our portfolio of architectural works",
+    "filter_all": "All",
+    "filter_residential": "Residential",
+    "filter_commercial": "Commercial",
+    "filter_office": "Office",
+    "filter_villa": "Villa",
+    "filter_cultural": "Cultural",
+    "filter_educational": "Educational",
+    "filter_other": "Other",
+    "loading": "Loading...",
+    "no_projects": "No projects found",
+    "error": "Error loading projects",
+    "view_details": "View Details",
+    "featured": "Featured",
+    "views": "views",
+    "square_meters": "m²"
+  },
+  "footer": {
+    "tagline": "Architecture & Design Portfolio",
+    "copyright": "All rights reserved."
+  },
+  "about": {
+    "title": "About Us",
+    "story": {
+      "title": "The dorsadesign Story",
+      "paragraph1": "dorsadesign is an architecture design studio dedicated to creating inspiring and functional spaces with a modern and creative approach.",
+      "paragraph2": "With a team of professional architects and designers, we create projects that are not only beautiful but also sustainable and environmentally friendly."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "text": "Creating spaces that transform lives. We combine art, science, and technology to create timeless architecture."
+    },
+    "stats": {
+      "projects": "Completed Projects",
+      "clients": "Happy Clients",
+      "awards": "Design Awards",
+      "experience": "Years of Experience"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with us",
+    "form": {
+      "title": "Send a Message",
+      "name": "Full Name",
+      "name_required": "Name is required",
+      "name_placeholder": "Enter your full name",
+      "email": "Email",
+      "email_required": "Email is required",
+      "email_invalid": "Invalid email address",
+      "email_placeholder": "Enter your email",
+      "subject": "Subject",
+      "subject_placeholder": "Enter subject",
+      "message": "Message",
+      "message_required": "Message is required",
+      "message_placeholder": "Write your message...",
+      "send": "Send Message",
+      "sending": "Sending..."
+    },
+    "info": {
+      "title": "Contact Information",
+      "email": "Email",
+      "phone": "Phone",
+      "phone_number": "+98",
+      "phone_number_ref": "+98",
+      "address": "Address",
+      "address_text": "Bastak"
+    },
+    "success": "Your message has been sent successfully!",
+    "error": "Error sending message. Please try again.",
+    "map": "Map"
+  },
+  "project": {
+    "back": "Back",
+    "back_to_home": "Back to Home",
+    "not_found": "Project not found",
+    "error_loading": "Error loading project",
+    "features": "Features",
+    "gallery": "Gallery",
+    "views": "views",
+    "square_meters": "m²",
+    "related_projects": "Related Projects"
+  },
+  "admin": {
+    "login": {
+      "title": "Admin Login",
+      "username": "Username",
+      "username_placeholder": "Enter your username",
+      "password": "Password",
+      "password_placeholder": "Enter your password",
+      "button": "Sign In",
+      "loading": "Signing in...",
+      "footer": "Protected area - Authorized access only"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "logout": "Logout",
+      "welcome": "Welcome back,",
+      "add_project": "Add Project",
+      "projects_list": "List of projects will be displayed here.",
+      "total_projects": "Total Projects",
+      "profile": "My Profile"
+    },
+    "profile": {
+      "title": "My Profile",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "basic_info": "Basic Information",
+      "username": "Username",
+      "username_readonly": "Username cannot be changed",
+      "full_name": "Full Name",
+      "full_name_placeholder": "Enter your full name",
+      "email": "Email",
+      "email_placeholder": "Enter your email",
+      "change_password": "Change Password",
+      "password_hint": "Leave blank if you don't want to change your password",
+      "current_password": "Current Password",
+      "current_password_placeholder": "Enter current password",
+      "new_password": "New Password",
+      "new_password_placeholder": "Enter new password (min 6 chars)",
+      "confirm_password": "Confirm New Password",
+      "confirm_password_placeholder": "Confirm new password"
+    },
+    "project": {
+      "create_title": "Add New Project",
+      "cancel": "Cancel",
+      "save": "Save Project",
+      "saving": "Saving...",
+      "persian_section": "Persian (Farsi)",
+      "english_section": "English",
+      "general_info": "General Information",
+      "title": "Title",
+      "description": "Short Description",
+      "full_description": "Full Description",
+      "slug": "Slug (URL Identifier)",
+      "type": "Project Type",
+      "client": "Client Name",
+      "year": "Year",
+      "area": "Area (m²)",
+      "status": "Status",
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived",
+      "featured": "Featured Project",
+      "features": "Features",
+      "add_feature": "Add Feature",
+      "feature_placeholder": "Enter a feature...",
+      "images": "Images",
+      "cover_image": "Cover Image",
+      "change_image": "Change Image",
+      "click_to_upload": "Click to upload or drag and drop",
+      "supported_formats": "Supports: JPG, PNG, WebP (Max 10MB)",
+      "choose_image": "Choose Image",
+      "views": "Views",
+      "actions": "Actions",
+      "slug_hint": "Auto-generated from English title. Edit manually if needed.",
+      "gallery_images": "Gallery Images",
+      "click_to_upload_cover": "Click to upload cover image",
+      "click_to_upload_gallery": "Click to upload gallery images",
+      "choose_cover": "Choose Cover",
+      "choose_gallery": "Choose Gallery",
+      "edit_title": "Edit Project",
+      "update": "Update Project"
+    }
+  }
+}
