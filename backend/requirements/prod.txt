@@ -1,9 +1,0 @@
-# --index-url https://mirror2.chabokan.net/pypi/simple/
-
-# وابستگی‌های پایه
--r base.txt
-
-# Production Optimizations
-gunicorn==23.0.0
-uvloop==0.21.0
-httptools==0.6.4
