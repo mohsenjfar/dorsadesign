@@ -1,11 +1,19 @@
 # dorsadesign.ir
 
-A modern architecture portfolio website with multilingual support (English/Persian), featuring a project gallery and an admin panel for content management.
+*[نسخه فارسی / Persian version](README-fa.md)*
 
 ![Version](https://img.shields.io/badge/version-2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.11-green)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)
 ![React](https://img.shields.io/badge/React-18-blue)
+
+## The problem
+
+An architecture studio needed a portfolio site that reads naturally in both English and Persian (including RTL layout), lets non-technical staff add/edit projects without touching code, and looks credible enough to show to prospective clients — most existing template solutions handle one of those, not all three.
+
+## The solution
+
+A custom FastAPI + React site with a bilingual content model baked into the database (JSON fields per field, not a translation plugin bolted on afterward), a project gallery with filtering and a lightbox/slideshow for project details, and a JWT-authenticated admin panel so the studio can manage the catalog themselves after handoff. Live and in production at [dorsadesign.ir](https://dorsadesign.ir).
 
 ## ✨ Features
 
@@ -96,14 +104,9 @@ Once running, visit:
 - **ReDoc**: `/api/redoc`
 - **Health Check**: `/api/health`
 
-## 🔐 Default Admin Credentials
+## 🔐 Admin Setup
 
-```
-Username: admin
-Password: admin123
-```
-
-⚠️ **IMPORTANT**: Change the default password immediately after first login!
+The first admin account is created from the `ADMIN_USERNAME` / `ADMIN_PASSWORD` environment variables (see `backend/seed_admin.py`) — set strong values via Gitea Secrets before first deploy. If no environment values are provided, the seed script falls back to a well-known placeholder, so **never run it against a public-facing environment without setting these first**.
 
 ## 📊 Project Status
 
@@ -120,5 +123,5 @@ Architecture & Design Studio
 
 ---
 
-**Repository**: https://git.aracom.ir/ARACOM/dorsadesign.ir.git  
+**Repository**: https://github.com/mohsenjfar/dorsadesign  
 **Website**: https://dorsadesign.ir
