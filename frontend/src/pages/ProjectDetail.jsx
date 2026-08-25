@@ -16,7 +16,7 @@ import {
   FiX
 } from 'react-icons/fi'
 import { useTranslation } from 'react-i18next'
-import { getProjectById, getProjectBySlug } from '../services/api'
+import { getProjectById, getProjectBySlug, getImageUrl } from '../services/api'
 
 const ProjectDetail = () => {
   const { id, slug } = useParams()
@@ -71,9 +71,10 @@ const ProjectDetail = () => {
   }
 
   const galleryImages = getGalleryImages()
-  const allImages = project?.cover_image 
+  const allImages = (project?.cover_image
     ? [project.cover_image, ...galleryImages]
     : galleryImages
+  ).map(getImageUrl)
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % allImages.length)

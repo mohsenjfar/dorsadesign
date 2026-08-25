@@ -8,7 +8,7 @@ import {
   FiImage, FiLoader, FiArrowLeft 
 } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
-import api from '../../services/api'
+import api, { getImageUrl } from '../../services/api'
 
 const EditProject = () => {
   const { id } = useParams()
@@ -281,7 +281,7 @@ const EditProject = () => {
           ) : formData.cover_image ? (
             <div className="relative max-w-md mx-auto">
               <img
-                src={formData.cover_image}
+                src={getImageUrl(formData.cover_image)}
                 alt="Cover"
                 className="w-full h-48 object-cover rounded-lg"
               />
@@ -332,7 +332,7 @@ const EditProject = () => {
               {formData.gallery_images.map((url, index) => (
                 <div key={index} className="relative aspect-square">
                   <img
-                    src={url}
+                    src={getImageUrl(url)}
                     alt={`Gallery ${index + 1}`}
                     className="w-full h-full object-cover rounded-lg"
                   />

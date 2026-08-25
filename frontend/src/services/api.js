@@ -1,7 +1,8 @@
 // frontend/src/services/api.js
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+// خالی یعنی نسبی به همون origin صفحه — هر endpoint خودش پیشوند /api/ رو داره
+const API_BASE_URL = import.meta.env.VITE_API_URL || ''
 
 console.log('🔵 API Base URL:', API_BASE_URL)
 
@@ -145,6 +146,15 @@ export const getProjectById = async (id) => {
     console.error('Error fetching project details:', error)
     throw error
   }
+}
+
+// آپلودها روی بک‌اند سرو می‌شن نه فرانت‌اند، پس مسیرهای نسبی /uploads باید به آدرس بک‌اند اشاره کنن
+export const getImageUrl = (url) => {
+  if (!url) return null
+  if (url.startsWith('/uploads')) {
+    return `${API_BASE_URL}${url}`
+  }
+  return url
 }
 
 export default api

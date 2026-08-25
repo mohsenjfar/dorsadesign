@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { FiEye, FiTag, FiCalendar, FiMaximize2 } from 'react-icons/fi'
 import { useTranslation } from 'react-i18next'
+import { getImageUrl } from '../../services/api'
 
 const ProjectCard = ({ project, index }) => {
   const { t } = useTranslation()
@@ -73,19 +74,6 @@ const ProjectCard = ({ project, index }) => {
   }
 
   const formattedDate = formatDate(created_at)
-
-  // ============================================
-  // Fallback image
-  // ============================================
-  const getImageUrl = (url) => {
-    if (!url) return null
-    // اگر URL با /uploads شروع می‌شود، به backend اشاره می‌کند
-    if (url.startsWith('/uploads')) {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-      return `${apiUrl}${url}`
-    }
-    return url
-  }
 
   const imageUrl = getImageUrl(cover_image)
 
