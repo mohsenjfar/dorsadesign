@@ -88,7 +88,7 @@ docker compose up -d app
 └── docker-entrypoint.sh
 ```
 
-## 🔧 Environment Variables
+## 🔧 Environment Variables (Legacy Docker)
 
 All variables are managed via **Gitea Secrets & Variables**:
 
@@ -96,6 +96,23 @@ All variables are managed via **Gitea Secrets & Variables**:
 |------|-----------|
 | **Secrets** | `POSTGRES_PASSWORD`, `SECRET_KEY` |
 | **Variables** | `POSTGRES_USER`, `POSTGRES_DB`, `CORS_ORIGINS`, `VITE_API_URL`, `ADMIN_USERNAME`, `ADMIN_PASSWORD` |
+
+## 🔧 Environment Variables (New: Vercel + Supabase)
+
+### Frontend (Vercel)
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_SUPABASE_URL` | Supabase Project URL | ✅ |
+| `VITE_SUPABASE_ANON_KEY` | Supabase Anonymous Key | ✅ |
+
+### Backend (Railway/Render - Optional)
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | Supabase Postgres connection string | ✅ |
+| `SUPABASE_URL` | Supabase Project URL | ✅ |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Service Role Key | ✅ |
+| `SECRET_KEY` | JWT Secret (32+ chars) | ✅ |
+| `CORS_ORIGINS` | Vercel preview/production URLs | ✅ |
 
 ## 📚 API Documentation
 
