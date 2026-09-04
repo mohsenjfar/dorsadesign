@@ -6,7 +6,9 @@
   "outputDirectory": "dist",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "regions": ["iad1"],
+  "regions": [
+    "iad1"
+  ],
   "functions": {
     "src/**/*.ts": {
       "maxDuration": 30
@@ -43,11 +45,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/uploads/(.*)",
-      "destination": "https://your-project-ref.supabase.co/storage/v1/object/public/project-images/$1"
+      "destination": "https://udkklkmcxipnaxiqzgop.supabase.co/rest/v1/$1"
     }
   ],
   "crons": []

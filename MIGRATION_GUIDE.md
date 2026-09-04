@@ -43,6 +43,76 @@ This guide covers migrating from the current Docker-based deployment to a modern
    - `service_role` secret key → `SUPABASE_SERVICE_ROLE_KEY` (backend only!)
 
 ---
+## Current Status (as of migration continuation)
+
+**✅ Completed:**
+- Docker database dump saved to `dorsadesign_backup.sql` (7KB, 1 admin user, 1 project)
+- Schema analysis complete: Current DB has `admins` and `projects` tables with custom enums; Supabase schema uses `profiles` (auth-linked) and `projects` with different structure
+- Created `supabase/migrate_data.sql` - transforms docker data to Supabase schema (admins→auth.users+profiles, projects→projects with field mapping, gallery_images→project_images)
+- Frontend `vercel.json` configured (needs Supabase project ref update in rewrites)
+- Frontend uses `@supabase/supabase-js` v2, React 19, Vite 8, Tailwind 3
+- Backend ready: FastAPI + SQLAlchemy + Alembic, requirements in `backend/requirements/`
+
+**🔄 Next Steps (require user action):**
+
+### 1. Supabase Setup (User must provide)
+- [ ] Create Supabase project at supabase.com
+- [ ] Run `supabase/schema.sql` in SQL Editor
+- [ ] Enable Auth providers (Email, Google, GitHub)
+- [ ] Create `project-images` storage bucket (public)
+- [ ] Run storage policies from schema.sql (commented section)
+- [ ] Provide: Project URL, anon key, service_role key
+
+### 2. Database Migration
+- [ ] Copy data from `dorsadesign_backup.sql` into `supabase/migrate_data.sql` temp tables
+- [ ] Run `supabase/migrate_data.sql` in SQL Editor
+- [ ] Verify: `SELECT COUNT(*) FROM profiles, projects, project_images;`
+
+### 3. Frontend Deployment (Vercel)
+- [ ] Create `.env.local` in `frontend/` with Supabase credentials
+- [ ] Update `vercel.json` rewrites with actual Supabase project ref
+- [ ] Deploy via Vercel CLI or GitHub integration
+- [ ] Add env vars in Vercel Dashboard: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- [ ] Configure custom domain `dorsadesign.ir`
+
+### 4. Backend Deployment (Railway - Optional)
+- [ ] Create `railway.json` (template in guide)
+- [ ] Deploy to Railway with Supabase DATABASE_URL
+- [ ] Set env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SECRET_KEY`, `CORS_ORIGINS`
+- [ ] Update Vercel: `VITE_API_URL=https://your-api.railway.app`
+
+### 5. File Storage Migration
+- [ ] Download uploads volume: `docker run --rm -v dorsadesign_uploads_data:/data -v $(pwd):/backup alpine tar czf /backup/uploads.tar.gz -C /data .`
+- [ ] Upload to Supabase Storage bucket `project-images`
+
+---
+
+## Schema Mapping Reference
+
+| Docker Table | Supabase Table | Notes |
+|--------------|----------------|-------|
+| `admins` | `auth.users` + `profiles` | Password hashes don't migrate; users must reset password or use OAuth |
+| `projects` | `projects` | Field mapping: project_type→category, status→status, cover_image→featured_image_url, gallery_images→gallery_images[] + project_images table |
+| `alembic_version` | (drop) | Not needed in Supabase |
+
+---
+
+## Required from User
+
+Please provide:
+1. **Supabase Project URL** (e.g., `https://xyz.supabase.co`)
+2. **Supabase anon key** (public, for frontend)
+3. **Supabase service_role key** (secret, for backend only)
+4. **Vercel account** (for GitHub integration or CLI deploy)
+5. **Railway account** (optional, for backend API)
+
+Once you provide the Supabase credentials, I can:
+- Create the `.env` files
+- Update `vercel.json` with the correct project ref
+- Guide through running the migration SQL
+- Deploy to Vercel
+
+---
 
 ## Phase 2: Database Migration (from Docker)
 
