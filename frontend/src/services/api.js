@@ -1,5 +1,6 @@
 // frontend/src/services/api.js
 import axios from 'axios'
+import { supabase } from '../lib/supabaseClient'
 
 // خالی یعنی نسبی به همون origin صفحه — هر endpoint خودش پیشوند /api/ رو داره
 const API_BASE_URL = import.meta.env.VITE_API_URL || ''
@@ -14,15 +15,25 @@ const api = axios.create({
 })
 
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     config.params = {
       ...config.params,
       language: 'fa',
     }
 
-    const token = localStorage.getItem('access_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // Supabase access token (auto-refreshed by the Supabase client).
+    // Falls back to the mirrored legacy slot for safety.
+    try {
+      const { data } = await supabase.auth.getSession()
+      const token = data.session?.access_token || localStorage.getItem('access_token')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch {
+      const token = localStorage.getItem('access_token')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
 
     return config
@@ -53,37 +64,17 @@ api.interceptors.response.use(
       method: originalRequest?.method,
     })
 
-    // اگر خطای 401 بود و قبلاً برای refresh تلاش نکرده بودیم
+    // NOTE: no manual refresh — Supabase rotates its own tokens.
+    // A 401 on an admin/auth endpoint means the session is gone → login.
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
-
-      try {
-        const refreshToken = localStorage.getItem('refresh_token')
-        if (!refreshToken) {
-          throw new Error('No refresh token')
-        }
-
-        // درخواست توکن جدید
-        const response = await axios.post(
-          `${api.defaults.baseURL}/api/auth/refresh`,
-          { refresh_token: refreshToken }
-        )
-
-        const { access_token } = response.data
-        localStorage.setItem('access_token', access_token)
-        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-
-        // درخواست اصلی را با توکن جدید تکرار کن
-        originalRequest.headers.Authorization = `Bearer ${access_token}`
-        return api(originalRequest)
-      } catch (refreshError) {
-        console.error('❌ Refresh token failed:', refreshError)
-        // اگر رفرش ناموفق بود، کاربر را به لاگین هدایت کن
+      const url = originalRequest?.url || ''
+      if (url.startsWith('/api/admin') || url.startsWith('/api/auth')) {
         localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
         delete api.defaults.headers.common['Authorization']
-        window.location.href = '/admin/login'
-        return Promise.reject(refreshError)
+        if (window.location.pathname !== '/admin/login') {
+          window.location.href = '/admin/login'
+        }
       }
     }
 

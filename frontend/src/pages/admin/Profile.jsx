@@ -8,12 +8,12 @@ import {
   FiLoader, FiArrowLeft, FiCheckCircle 
 } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
-import api from '../../services/api'
+import { supabase } from '../../lib/supabaseClient'
 
 const Profile = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user, token } = useAuth()
+  const { user, refreshUser } = useAuth()
   
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -26,41 +26,50 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
-    current_password: '',
     new_password: '',
     confirm_password: '',
   })
 
   const [showPasswords, setShowPasswords] = useState({
-    current: false,
     new: false,
     confirm: false,
   })
 
   // ============================================
-  // دریافت اطلاعات کاربر
+  // دریافت اطلاعات کاربر (Supabase Auth + جدول profiles)
   // ============================================
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true)
       setError('')
       try {
-        const response = await api.get('/api/auth/me')
-        const data = response.data
+        let fullName = user?.full_name || ''
+        if (user?.id) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .maybeSingle()
+          if (data?.full_name) fullName = data.full_name
+        }
         setFormData(prev => ({
           ...prev,
-          full_name: data.full_name || '',
-          email: data.email || '',
+          full_name: fullName,
+          email: user?.email || '',
         }))
       } catch (err) {
-        setError(err.response?.data?.detail || 'خطا در دریافت اطلاعات')
+        setError(err.message || 'خطا در دریافت اطلاعات')
       } finally {
         setLoading(false)
       }
     }
 
-    fetchProfile()
-  }, [])
+    if (user) {
+      fetchProfile()
+    } else {
+      setLoading(false)
+    }
+  }, [user])
 
   // ============================================
   // مدیریت فیلدها
@@ -97,37 +106,41 @@ const Profile = () => {
     }
 
     try {
-      // ✅ ساخت داده‌های ارسالی
-      const updateData = {
-        full_name: formData.full_name,
-        email: formData.email,
+      // تغییر ایمیل از طریق Supabase Auth (ممکن است نیاز به تأیید ایمیل جدید باشد)
+      if (formData.email && formData.email !== user?.email) {
+        const { error } = await supabase.auth.updateUser({ email: formData.email })
+        if (error) throw error
       }
 
-      // اگر رمز عبور جدید وارد شده، آن را هم ارسال کن
+      // تغییر رمز عبور از طریق Supabase Auth (بر اساس سشن فعلی، بدون نیاز به رمز فعلی)
       if (formData.new_password) {
-        updateData.current_password = formData.current_password
-        updateData.new_password = formData.new_password
+        const { error } = await supabase.auth.updateUser({ password: formData.new_password })
+        if (error) throw error
       }
 
-      const response = await api.put('/api/auth/profile', updateData)
-      
+      // به‌روزرسانی نام کامل در جدول profiles
+      if (user?.id) {
+        const { error } = await supabase
+          .from('profiles')
+          .upsert(
+            { id: user.id, full_name: formData.full_name, updated_at: new Date().toISOString() },
+            { onConflict: 'id' }
+          )
+        if (error) throw error
+      }
+
+      await refreshUser()
+
       setSuccess('اطلاعات با موفقیت به‌روزرسانی شد')
-      
+
       // پاک کردن فیلدهای رمز عبور
       setFormData(prev => ({
         ...prev,
-        current_password: '',
         new_password: '',
         confirm_password: '',
       }))
-
-      // به‌روزرسانی اطلاعات کاربر در Context
-      if (response.data) {
-        // AuthContext را به‌روزرسانی کنید
-        window.location.reload()
-      }
     } catch (err) {
-      setError(err.response?.data?.detail || 'خطا در به‌روزرسانی اطلاعات')
+      setError(err.message || 'خطا در به‌روزرسانی اطلاعات')
     } finally {
       setSaving(false)
     }
@@ -260,29 +273,6 @@ const Profile = () => {
           </p>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('admin.profile.current_password')}
-              </label>
-              <div className="relative">
-                <input
-                  type={showPasswords.current ? 'text' : 'password'}
-                  name="current_password"
-                  value={formData.current_password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-dark-400 bg-white dark:bg-dark-300 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 transition pr-10"
-                  placeholder={t('admin.profile.current_password_placeholder')}
-                />
-                <button
-                  type="button"
-                  onClick={() => togglePassword('current')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
-                >
-                  {showPasswords.current ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('admin.profile.new_password')}

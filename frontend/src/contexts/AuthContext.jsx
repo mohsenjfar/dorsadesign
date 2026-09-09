@@ -1,6 +1,17 @@
 // frontend/src/contexts/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react'
+// Supabase Auth (replaces the old FastAPI JWT /api/auth/* flow).
+//
+// Session source of truth: supabase.auth.getSession() + onAuthStateChange.
+// Supabase handles token refresh internally — no manual /api/auth/refresh.
+//
+// Admin gating: the old backend `is_superuser` flag maps to the Supabase
+// user's `role` (app_metadata.role, fallback user_metadata.role).
+// This site has a single admin area: any authenticated user may enter
+// (ProtectedRoute checks isAuthenticated, unchanged). `isAdmin` is exposed
+// for conditional UI and equals role === 'admin'.
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabaseClient'
 import api from '../services/api'
 
 const AuthContext = createContext()
@@ -13,111 +24,162 @@ export const useAuth = () => {
   return context
 }
 
+// Map a Supabase auth user to the app's user shape.
+// Keeps legacy fields (username, full_name, is_superuser) so admin pages
+// (Dashboard, Profile) keep working unchanged.
+const mapUser = (sbUser) => {
+  if (!sbUser) return null
+  const appMeta = sbUser.app_metadata || {}
+  const userMeta = sbUser.user_metadata || {}
+  const role = appMeta.role || userMeta.role || 'admin'
+  const email = sbUser.email || ''
+  return {
+    id: sbUser.id,
+    email,
+    username: userMeta.username || (email ? email.split('@')[0] : ''),
+    full_name: userMeta.full_name || userMeta.display_name || '',
+    role,
+    // Back-compat with the old FastAPI `is_superuser` flag
+    is_superuser: role === 'admin',
+  }
+}
+
+// Mirror the Supabase access token into the legacy localStorage slot so any
+// remaining readers (axios interceptor, debugging) keep working.
+const mirrorToken = (session) => {
+  const token = session?.access_token
+  if (token) {
+    localStorage.setItem('access_token', token)
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  } else {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token') // legacy FastAPI slot, no longer used
+    delete api.defaults.headers.common['Authorization']
+  }
+  return token || null
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
+  const [session, setSession] = useState(null)
+  const [token, setToken] = useState(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
   // ============================================
-  // دریافت توکن از localStorage
-  // ============================================
-  const getToken = () => localStorage.getItem('access_token')
-
-  // ============================================
-  // بررسی احراز هویت (بر اساس وجود توکن)
-  // ============================================
-  const isAuthenticated = !!user || !!getToken()
-
-  // ============================================
-  // Load user on mount و هر بار که توکن تغییر کند
+  // Initial session + auth state subscription
   // ============================================
   useEffect(() => {
-    const loadUser = async () => {
-      const token = getToken()
-      
-      if (!token) {
-        setLoading(false)
-        return
-      }
+    let mounted = true
 
-      // ✅ تنظیم هدر Authorization
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-
+    const init = async () => {
       try {
-        const response = await api.get('/api/auth/me')
-        setUser(response.data)
+        const { data, error } = await supabase.auth.getSession()
+        if (error) throw error
+        if (!mounted) return
+        setSession(data.session || null)
+        setUser(mapUser(data.session?.user))
+        setToken(mirrorToken(data.session))
       } catch (error) {
-        console.error('Failed to load user:', error)
-        // اگر توکن نامعتبر است، آن را پاک کن
-        if (error.response?.status === 401) {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
-          delete api.defaults.headers.common['Authorization']
+        console.error('Failed to load session:', error)
+        if (mounted) {
+          setSession(null)
+          setUser(null)
+          setToken(null)
         }
       } finally {
-        setLoading(false)
+        if (mounted) setLoading(false)
       }
     }
 
-    loadUser()
-  }, []) // ✅ فقط یک بار در mount
+    init()
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (!mounted) return
+      setSession(newSession)
+      setUser(mapUser(newSession?.user))
+      setToken(mirrorToken(newSession))
+      setLoading(false)
+    })
+
+    return () => {
+      mounted = false
+      listener?.subscription?.unsubscribe()
+    }
+  }, [])
+
+  const isAuthenticated = !!user && !!session
+  const isAdmin = user?.role === 'admin' || !!user?.is_superuser
 
   // ============================================
-  // Login
+  // Login — Supabase signInWithPassword (email + password).
+  // The login form's "username" field is treated as the email address.
   // ============================================
   const login = async (username, password) => {
     try {
-      const response = await api.post('/api/auth/login', { username, password })
-      const { access_token, refresh_token } = response.data
-      
-      localStorage.setItem('access_token', access_token)
-      localStorage.setItem('refresh_token', refresh_token)
-      
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
-      
-      const userResponse = await api.get('/api/auth/me')
-      setUser(userResponse.data)
-      
+      const email = (username || '').trim()
+      if (!email || !password) {
+        return { success: false, message: 'Email and password are required' }
+      }
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw error
+      setSession(data.session)
+      setUser(mapUser(data.session?.user))
+      setToken(mirrorToken(data.session))
       return { success: true }
     } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.detail || 'Login failed'
-      }
+      const msg =
+        error?.message === 'Invalid login credentials'
+          ? 'Invalid email or password'
+          : error?.message || 'Login failed'
+      return { success: false, message: msg }
     }
   }
 
   // ============================================
-  // Logout
+  // Logout — Supabase signOut
   // ============================================
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
-      const token = getToken()
-      if (token) {
-        await api.post('/api/auth/logout', {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      }
+      await supabase.auth.signOut()
     } catch (error) {
       console.error('Logout error:', error)
-      // حتی اگر خطا هم باشد، توکن را پاک می‌کنیم
     } finally {
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-      delete api.defaults.headers.common['Authorization']
+      setSession(null)
       setUser(null)
+      setToken(null)
+      mirrorToken(null)
       navigate('/admin/login')
     }
-  }
+  }, [navigate])
+
+  // Re-read the current Supabase user (e.g. after a profile update)
+  const refreshUser = useCallback(async () => {
+    try {
+      const { data } = await supabase.auth.getUser()
+      setUser(mapUser(data?.user))
+    } catch (error) {
+      console.error('Failed to refresh user:', error)
+    }
+  }, [])
+
+  const getToken = () => token || localStorage.getItem('access_token')
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      loading,
-      isAuthenticated,
-      login,
-      logout,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        token,
+        loading,
+        isAuthenticated,
+        isAdmin,
+        login,
+        logout,
+        refreshUser,
+        getToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
