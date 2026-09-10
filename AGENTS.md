@@ -57,3 +57,8 @@ uvicorn app.main:app --reload          # local API → http://localhost:8000
 
 - Never print or commit secrets (`.env`, service-role keys, DB passwords).
 - `dorsadesign_backup.sql` at root is untracked local data — leave it alone.
+
+## Task specs (rate-limit resume)
+
+- Before starting a task, write its spec to `docs/tasks/NNN-slug.md`: goal, context, acceptance criteria.
+- If rate-limited mid-task, the retry resumes by reading that file — do not rewrite the spec.
